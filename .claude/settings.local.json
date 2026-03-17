@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/src/scanner)",
+      "Bash(mkdir -p /Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/src/parser)",
+      "Bash(mkdir -p /Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/src/graph)",
+      "Bash(mkdir -p /Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/src/architecture)",
+      "Bash(mkdir -p /Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/src/summarizer)",
+      "Bash(pip install:*)",
+      "Bash(repobrain analyze:*)",
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(dot -V)",
+      "Bash(brew install:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/analysis"
+    ]
+  }
+}

@@ -1,0 +1,1095 @@
+{
+  "files": {
+    "__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "ui/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "ui/app.py": {
+      "language": "Python",
+      "functions": [
+        "_load_json",
+        "_not_analyzed",
+        "_build_llm",
+        "_build_rag"
+      ],
+      "classes": [],
+      "imports": [
+        "import json",
+        "import sys",
+        "from pathlib import Path",
+        "import streamlit as st",
+        "from repobrain.src.llm.openai_client import OpenAIClient",
+        "from repobrain.src.llm.ollama_client import OllamaClient",
+        "from repobrain.src.llm.rag import RAGIndex",
+        "from repobrain.src.scanner.scanner import RepoScanner",
+        "from repobrain.src.parser.parser import CodeParser",
+        "from repobrain.src.graph.graph_builder import GraphBuilder",
+        "from repobrain.src.architecture.analyzer import ArchitectureAnalyzer",
+        "from repobrain.src.llm.rag import RAGIndex",
+        "from streamlit_agraph import agraph, Node, Edge, Config",
+        "import networkx as nx",
+        "import networkx as nx",
+        "import pandas as pd",
+        "import networkx as nx",
+        "from repobrain.src.impact.impact_analyzer import ImpactAnalyzer",
+        "from repobrain.src.effort.effort_estimator import EffortEstimator"
+      ],
+      "comments": [
+        {
+          "text": "\u2500\u2500 helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 page config \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 sidebar \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 main tabs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 Overview \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 Architecture \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Build nodes",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: Build nodes"
+        },
+        {
+          "text": "Load graph edges from GraphML if available",
+          "detected_language": "en"
+        },
+        {
+          "text": "Legend",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500 Dependencies \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Top modules by centrality",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500 Modules \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 Ask \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500 Impact \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Effort card",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "config/config.py": {
+      "language": "Python",
+      "functions": [
+        "_find_config_file",
+        "get_config",
+        "reload_config"
+      ],
+      "classes": [],
+      "imports": [
+        "from pathlib import Path",
+        "import yaml"
+      ],
+      "comments": [
+        {
+          "text": "Apply defaults for any missing keys",
+          "detected_language": "en"
+        },
+        {
+          "text": "Walk up from this file's location to find config.yaml in the project root.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Load and return the configuration from config.yaml.\n\n    Returns a dict with all configuration values. The result is cached\n    after the first call.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Force reload of configuration from disk.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "config/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        "from .config import get_config"
+      ],
+      "comments": []
+    },
+    "tests/test_parser.py": {
+      "language": "Python",
+      "functions": [
+        "_make_repo",
+        "test_parse_python_functions",
+        "test_parse_python_classes",
+        "test_parse_python_imports",
+        "test_parse_writes_json",
+        "test_parse_unknown_extension_skipped",
+        "test_parse_js"
+      ],
+      "classes": [],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import pytest",
+        "from repobrain.src.parser.parser import CodeParser"
+      ],
+      "comments": [
+        {
+          "text": "\\\nimport os\nfrom pathlib import Path\n\nclass MyService:\n    def do_thing(self):\n        pass\n\ndef helper():\n    return 42",
+          "detected_language": "en"
+        },
+        {
+          "text": "\\\nimport { foo } from './foo';\n\nclass MyComponent {\n    render() {}\n}\n\nfunction greet(name) {\n    return `Hello ${name}`;\n}",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "tests/test_scanner.py": {
+      "language": "Python",
+      "functions": [
+        "_make_repo",
+        "test_scan_detects_python",
+        "test_scan_detects_entry_point",
+        "test_scan_skips_git_dir",
+        "test_scan_detects_fastapi",
+        "test_scan_writes_json",
+        "test_scan_loc_count"
+      ],
+      "classes": [],
+      "imports": [
+        "import json",
+        "import os",
+        "import tempfile",
+        "from pathlib import Path",
+        "import pytest",
+        "from repobrain.src.scanner.scanner import RepoScanner"
+      ],
+      "comments": [
+        {
+          "text": "Only app.py should be counted, not .git files",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "tests/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "tests/test_graph.py": {
+      "language": "Python",
+      "functions": [
+        "_parsed_code",
+        "_file_meta",
+        "test_graph_nodes_created",
+        "test_graph_edge_from_import",
+        "test_graph_no_self_loop",
+        "test_graphml_written",
+        "test_centrality_attached"
+      ],
+      "classes": [],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import networkx as nx",
+        "import pytest",
+        "from repobrain.src.graph.graph_builder import GraphBuilder"
+      ],
+      "comments": [
+        {
+          "text": "routes \u2192 service",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: routes \u2192 service"
+        }
+      ]
+    },
+    "cli/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "cli/main.py": {
+      "language": "Python",
+      "functions": [
+        "_build_llm_client",
+        "_build_rag",
+        "_load_json",
+        "_sep",
+        "cli",
+        "analyze",
+        "architecture",
+        "ask",
+        "impact"
+      ],
+      "classes": [],
+      "imports": [
+        "import json",
+        "import sys",
+        "from pathlib import Path",
+        "import click",
+        "from repobrain.config.config import get_config",
+        "from repobrain.src.scanner.scanner import RepoScanner",
+        "from repobrain.src.parser.parser import CodeParser",
+        "from repobrain.src.graph.graph_builder import GraphBuilder, load_graph",
+        "from repobrain.src.architecture.analyzer import ArchitectureAnalyzer",
+        "from repobrain.src.llm.rag import RAGIndex",
+        "from repobrain.src.summarizer.summarizer import ModuleSummarizer",
+        "from repobrain.src.summarizer.flow_mapper import FlowMapper",
+        "from repobrain.src.impact.impact_analyzer import ImpactAnalyzer",
+        "from repobrain.src.effort.effort_estimator import EffortEstimator",
+        "from repobrain.src.llm.openai_client import OpenAIClient",
+        "from repobrain.src.llm.ollama_client import OllamaClient",
+        "from repobrain.src.graph.graph_builder import load_graph"
+      ],
+      "comments": [
+        {
+          "text": "1. Scan",
+          "detected_language": "en"
+        },
+        {
+          "text": "2. Parse",
+          "detected_language": "en"
+        },
+        {
+          "text": "3. Build dependency graph",
+          "detected_language": "nl",
+          "translated_comment": "# [Translation needed]: 3. Build dependency graph"
+        },
+        {
+          "text": "4. Analyze architecture",
+          "detected_language": "en"
+        },
+        {
+          "text": "5. Build RAG index",
+          "detected_language": "de",
+          "translated_comment": "# [Translation needed]: 5. Build RAG index"
+        },
+        {
+          "text": "6. Summarize modules",
+          "detected_language": "ro",
+          "translated_comment": "# [Translation needed]: 6. Summarize modules"
+        },
+        {
+          "text": "7. Map flows",
+          "detected_language": "en"
+        },
+        {
+          "text": "Need parsed_code + graph for analysis",
+          "detected_language": "en"
+        },
+        {
+          "text": "We use current working directory as repo_path context",
+          "detected_language": "en"
+        },
+        {
+          "text": "User should run from the repo root, or we look for ./analysis/",
+          "detected_language": "en"
+        },
+        {
+          "text": "RepoBrain \u2014 AI-powered repository analysis tool.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Full repository analysis: scan \u2192 parse \u2192 graph \u2192 architecture \u2192 summarize.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Show the architecture of an already-analyzed repository.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Ask a natural language question about the repository.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Analyze the impact and effort of a proposed change.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "src/llm/ollama_client.py": {
+      "language": "Python",
+      "functions": [
+        "__init__",
+        "complete"
+      ],
+      "classes": [
+        "OllamaClient"
+      ],
+      "imports": [
+        "import requests",
+        "from .base import LLMClient"
+      ],
+      "comments": [
+        {
+          "text": "LLM client that calls a locally running Ollama instance.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/llm/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "src/llm/rag.py": {
+      "language": "Python",
+      "functions": [
+        "__init__",
+        "_get_embedder",
+        "_get_collection",
+        "build",
+        "query",
+        "is_built"
+      ],
+      "classes": [
+        "RAGIndex"
+      ],
+      "imports": [
+        "from pathlib import Path",
+        "from sentence_transformers import SentenceTransformer",
+        "import chromadb",
+        "import chromadb"
+      ],
+      "comments": [
+        {
+          "text": "Fresh index: delete existing collection if present",
+          "detected_language": "en"
+        },
+        {
+          "text": "ChromaDB IDs must be strings; use path as ID (sanitize)",
+          "detected_language": "en"
+        },
+        {
+          "text": "Embed in batches of 64",
+          "detected_language": "en"
+        },
+        {
+          "text": "Builds and queries a vector index over parsed repository code.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Embed all parsed files and store in ChromaDB.\n\n        Deletes and recreates the collection on each call for a fresh index.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Return top_k most relevant document chunks for the question.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Return True if the index has at least one document.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/llm/openai_client.py": {
+      "language": "Python",
+      "functions": [
+        "__init__",
+        "complete"
+      ],
+      "classes": [
+        "OpenAIClient"
+      ],
+      "imports": [
+        "from .base import LLMClient",
+        "from openai import OpenAI"
+      ],
+      "comments": [
+        {
+          "text": "LLM client that calls the OpenAI API.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/llm/base.py": {
+      "language": "Python",
+      "functions": [
+        "complete"
+      ],
+      "classes": [
+        "LLMClient"
+      ],
+      "imports": [
+        "from abc import ABC, abstractmethod"
+      ],
+      "comments": [
+        {
+          "text": "Abstract base class for LLM backends.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Send a prompt and return the model's text response.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/effort/effort_estimator.py": {
+      "language": "Python",
+      "functions": [
+        "estimate"
+      ],
+      "classes": [
+        "EffortEstimator"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import networkx as nx"
+      ],
+      "comments": [
+        {
+          "text": "--- files_score ---",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: --- files_score ---"
+        },
+        {
+          "text": "--- layer_score ---",
+          "detected_language": "en"
+        },
+        {
+          "text": "--- dependency_score ---",
+          "detected_language": "es",
+          "translated_comment": "# [Translation needed]: --- dependency_score ---"
+        },
+        {
+          "text": "--- centrality_score ---",
+          "detected_language": "en"
+        },
+        {
+          "text": "--- complexity mapping ---",
+          "detected_language": "en"
+        },
+        {
+          "text": "--- confidence ---",
+          "detected_language": "es",
+          "translated_comment": "# [Translation needed]: --- confidence ---"
+        },
+        {
+          "text": "Estimates engineering complexity and effort for a proposed change.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Compute an effort score from the impact report and graph metrics.\n\n        Scoring formula:\n            files_score       = len(affected_modules) * 2\n            layer_score       = unique_layers_affe",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/effort/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "src/graph/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        "from .graph_builder import GraphBuilder"
+      ],
+      "comments": []
+    },
+    "src/graph/graph_builder.py": {
+      "language": "Python",
+      "functions": [
+        "_module_name",
+        "_resolve_import",
+        "build",
+        "_render_png",
+        "load_graph"
+      ],
+      "classes": [
+        "GraphBuilder"
+      ],
+      "imports": [
+        "import json",
+        "import re",
+        "from pathlib import Path",
+        "import networkx as nx",
+        "import graphviz as gv"
+      ],
+      "comments": [
+        {
+          "text": "Remove extension and join with dots",
+          "detected_language": "en"
+        },
+        {
+          "text": "Normalize: remove 'from X import Y' \u2192 keep X; remove 'import X' \u2192 keep X",
+          "detected_language": "en"
+        },
+        {
+          "text": "Python: \"from x.y.z import something\" \u2192 x/y/z.py",
+          "detected_language": "en"
+        },
+        {
+          "text": "\"import x.y.z\"",
+          "detected_language": "es",
+          "translated_comment": "# [Translation needed]: \"import x.y.z\""
+        },
+        {
+          "text": "Convert dotted module to path candidates",
+          "detected_language": "en"
+        },
+        {
+          "text": "Generate candidates by progressively stripping leading segments.",
+          "detected_language": "en"
+        },
+        {
+          "text": "e.g. \"repobrain/src/scanner/scanner\" \u2192 also try \"src/scanner/scanner\", \"scanner/scanner\", etc.",
+          "detected_language": "it",
+          "translated_comment": "# [Translation needed]: e.g. \"repobrain/src/scanner/scanner\" \u2192 also try \"src/scanner/scanner\", \"scanner/scanner\", etc."
+        },
+        {
+          "text": "Try relative import from same directory",
+          "detected_language": "en"
+        },
+        {
+          "text": "Add all files as nodes",
+          "detected_language": "en"
+        },
+        {
+          "text": "Add edges from imports",
+          "detected_language": "en"
+        },
+        {
+          "text": "Compute centrality metrics and attach as node attributes",
+          "detected_language": "en"
+        },
+        {
+          "text": "Persist artifacts",
+          "detected_language": "en"
+        },
+        {
+          "text": "GraphML",
+          "detected_language": "en"
+        },
+        {
+          "text": "PNG via graphviz",
+          "detected_language": "hr",
+          "translated_comment": "# [Translation needed]: PNG via graphviz"
+        },
+        {
+          "text": "Truncate long labels",
+          "detected_language": "en"
+        },
+        {
+          "text": "Write to a temp name then rename",
+          "detected_language": "en"
+        },
+        {
+          "text": "graphviz appends .png automatically",
+          "detected_language": "en"
+        },
+        {
+          "text": "Convert a relative file path to a short module name.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Try to resolve an import string to a relative file path in the repo.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Builds a directed dependency graph from parsed code.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Construct a DiGraph from parsed_code and persist artifacts.\n\n        Parameters\n        ----------\n        parsed_code:\n            Output of CodeParser.parse() \u2014 dict with key \"files\".\n        repo_p",
+          "detected_language": "en"
+        },
+        {
+          "text": "Render the graph as a PNG using graphviz.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Load a previously saved dependency graph from GraphML.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/parser/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        "from .parser import CodeParser"
+      ],
+      "comments": []
+    },
+    "src/parser/parser.py": {
+      "language": "Python",
+      "functions": [
+        "_extract_comments_python",
+        "_extract_comments_js",
+        "_extract_comments_generic",
+        "_annotate_comments",
+        "_ts_query_captures",
+        "_parse_python_ts",
+        "walk",
+        "_parse_js_ts",
+        "_parse_regex",
+        "parse",
+        "_EXTENSION_TO_LANGUAGE_LOCAL"
+      ],
+      "classes": [
+        "CodeParser"
+      ],
+      "imports": [
+        "import json",
+        "import re",
+        "from pathlib import Path",
+        "from tree_sitter import Language, Parser as TSParser",
+        "import tree_sitter_python as tspython",
+        "import tree_sitter_javascript as tsjavascript",
+        "from langdetect import detect as langdetect_detect, LangDetectException"
+      ],
+      "comments": [
+        {
+          "text": "tree-sitter imports \u2014 version 0.21+ API",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Comment extraction helpers",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Single-line comments",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: Single-line comments"
+        },
+        {
+          "text": "Triple-quoted strings (rough extraction)",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Tree-sitter based extraction",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "require('...')",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: require('...')"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Regex-based fallbacks for other languages",
+          "detected_language": "en"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Main parser class",
+          "detected_language": "fr",
+          "translated_comment": "# [Translation needed]: Main parser class"
+        },
+        {
+          "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+          "detected_language": "unknown"
+        },
+        {
+          "text": "Persist result",
+          "detected_language": "ca",
+          "translated_comment": "# [Translation needed]: Persist result"
+        },
+        {
+          "text": "Extract # comments and docstrings from Python source.",
+          "detected_language": "en"
+        },
+        {
+          "text": "(.*?)",
+          "detected_language": "en"
+        },
+        {
+          "text": "Extract // and /* */ comments from JS/TS source.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Generic comment extraction covering // and # styles.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Detect language of each comment; flag non-English ones.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Run a tree-sitter query and return list of (node, capture_name).",
+          "detected_language": "en"
+        },
+        {
+          "text": "Use tree-sitter to extract functions, classes and imports from Python.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Use tree-sitter to extract functions, classes and imports from JS/TS.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Regex-based extraction for languages without tree-sitter support.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Parses source files and extracts structural metadata.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Parse the given list of files and extract code metadata.\n\n        Parameters\n        ----------\n        files:\n            Relative paths (relative to repo_path) of the files to parse.\n        repo_pa",
+          "detected_language": "en"
+        },
+        {
+          "text": "(.*?)",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/architecture/analyzer.py": {
+      "language": "Python",
+      "functions": [
+        "_classify_module",
+        "_detect_pattern",
+        "_build_mermaid",
+        "analyze"
+      ],
+      "classes": [
+        "ArchitectureAnalyzer"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import networkx as nx"
+      ],
+      "comments": [
+        {
+          "text": "Layer classification rules: check if any keyword appears in the lowercased path/filename",
+          "detected_language": "en"
+        },
+        {
+          "text": "Subgraph per layer",
+          "detected_language": "id",
+          "translated_comment": "# [Translation needed]: Subgraph per layer"
+        },
+        {
+          "text": "Connect layer subgraphs in order",
+          "detected_language": "en"
+        },
+        {
+          "text": "Attach layer info to graph nodes",
+          "detected_language": "en"
+        },
+        {
+          "text": "Return the architecture layer for a given file path.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Infer the overall architectural pattern from which layers are present.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Generate a Mermaid flowchart showing layers and their modules.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Classifies modules into architecture layers and detects patterns.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Analyze architecture from the dependency graph and parsed code.\n\n        Parameters\n        ----------\n        graph:\n            DiGraph from GraphBuilder.build().\n        parsed_code:\n            Ou",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/architecture/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "src/scanner/scanner.py": {
+      "language": "Python",
+      "functions": [
+        "_skip_dir",
+        "_detect_frameworks",
+        "scan"
+      ],
+      "classes": [
+        "RepoScanner"
+      ],
+      "imports": [
+        "import json",
+        "import os",
+        "from pathlib import Path"
+      ],
+      "comments": [
+        {
+          "text": "Python frameworks",
+          "detected_language": "en"
+        },
+        {
+          "text": "Also check pyproject.toml / setup.py / setup.cfg for python deps",
+          "detected_language": "en"
+        },
+        {
+          "text": "Node.js frameworks",
+          "detected_language": "da",
+          "translated_comment": "# [Translation needed]: Node.js frameworks"
+        },
+        {
+          "text": "Go modules",
+          "detected_language": "en"
+        },
+        {
+          "text": "Java / Maven",
+          "detected_language": "hr",
+          "translated_comment": "# [Translation needed]: Java / Maven"
+        },
+        {
+          "text": "Ruby",
+          "detected_language": "en"
+        },
+        {
+          "text": "Rust",
+          "detected_language": "en"
+        },
+        {
+          "text": "Prune skipped directories in-place to prevent os.walk from descending",
+          "detected_language": "en"
+        },
+        {
+          "text": "Count lines of code",
+          "detected_language": "en"
+        },
+        {
+          "text": "Check for entry points",
+          "detected_language": "en"
+        },
+        {
+          "text": "Persist result",
+          "detected_language": "ro",
+          "translated_comment": "# [Translation needed]: Persist result"
+        },
+        {
+          "text": "Return True if this directory should be skipped during scanning.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Detect frameworks present in the repository by examining marker files.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Scans a repository and extracts metadata such as languages, frameworks,\n    entry points, file counts and lines of code.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Walk the repository tree and collect metadata.\n\n        Parameters\n        ----------\n        repo_path:\n            Absolute or relative path to the repository root.\n\n        Returns\n        -------\n",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/scanner/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        "from .scanner import RepoScanner"
+      ],
+      "comments": []
+    },
+    "src/summarizer/flow_mapper.py": {
+      "language": "Python",
+      "functions": [
+        "map_flows",
+        "_bfs_flow"
+      ],
+      "classes": [
+        "FlowMapper"
+      ],
+      "imports": [
+        "from collections import deque",
+        "from pathlib import Path",
+        "import networkx as nx"
+      ],
+      "comments": [
+        {
+          "text": "Find the graph node that matches (entry may not include repo prefix)",
+          "detected_language": "en"
+        },
+        {
+          "text": "Maps execution flows starting from entry points through the dependency graph.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Trace call chains from each entry point using BFS.\n\n        Parameters\n        ----------\n        graph:\n            Dependency DiGraph.\n        entry_points:\n            List of relative file paths t",
+          "detected_language": "en"
+        },
+        {
+          "text": "BFS traversal returning an ordered list of visited nodes.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/summarizer/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    },
+    "src/summarizer/summarizer.py": {
+      "language": "Python",
+      "functions": [
+        "summarize_all"
+      ],
+      "classes": [
+        "ModuleSummarizer"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from repobrain.src.llm.base import LLMClient",
+        "from repobrain.src.llm.rag import RAGIndex"
+      ],
+      "comments": [
+        {
+          "text": "Generates natural language summaries for each module using LLM + RAG.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Summarize every file in parsed_code.\n\n        Returns\n        -------\n        dict: {\"file_path\": {\"summary\": str}}",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/impact/impact_analyzer.py": {
+      "language": "Python",
+      "functions": [
+        "analyze",
+        "_parse_json_array"
+      ],
+      "classes": [
+        "ImpactAnalyzer"
+      ],
+      "imports": [
+        "import json",
+        "import re",
+        "from pathlib import Path",
+        "import networkx as nx",
+        "from repobrain.src.llm.base import LLMClient",
+        "from repobrain.src.llm.rag import RAGIndex"
+      ],
+      "comments": [
+        {
+          "text": "Validate against actual files",
+          "detected_language": "ca",
+          "translated_comment": "# [Translation needed]: Validate against actual files"
+        },
+        {
+          "text": "BFS traversal: successors (downstream) and predecessors (upstream)",
+          "detected_language": "en"
+        },
+        {
+          "text": "downstream: modules that import seed",
+          "detected_language": "en"
+        },
+        {
+          "text": "upstream: modules that seed imports from",
+          "detected_language": "en"
+        },
+        {
+          "text": "Try to find a JSON array in the response",
+          "detected_language": "en"
+        },
+        {
+          "text": "Determines which modules are affected by a proposed change.",
+          "detected_language": "en"
+        },
+        {
+          "text": "Analyze change impact.\n\n        Step 1 \u2014 Ask LLM to identify seed modules from the change description.\n        Step 2 \u2014 BFS in both directions from seed modules to find all affected nodes.\n\n        Re",
+          "detected_language": "en"
+        },
+        {
+          "text": "Extract a JSON array of strings from LLM output.",
+          "detected_language": "en"
+        }
+      ]
+    },
+    "src/impact/__init__.py": {
+      "language": "Python",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "comments": []
+    }
+  }
+}

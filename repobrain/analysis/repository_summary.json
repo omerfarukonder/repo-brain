@@ -1,0 +1,48 @@
+{
+  "languages": [
+    "Python"
+  ],
+  "frameworks": [],
+  "entry_points": [
+    "ui/app.py",
+    "cli/main.py"
+  ],
+  "file_count": 32,
+  "loc_by_language": {
+    "Python": 2304
+  },
+  "files": [
+    "__init__.py",
+    "ui/__init__.py",
+    "ui/app.py",
+    "config/config.py",
+    "config/__init__.py",
+    "tests/test_parser.py",
+    "tests/test_scanner.py",
+    "tests/__init__.py",
+    "tests/test_graph.py",
+    "cli/__init__.py",
+    "cli/main.py",
+    "src/__init__.py",
+    "src/llm/ollama_client.py",
+    "src/llm/__init__.py",
+    "src/llm/rag.py",
+    "src/llm/openai_client.py",
+    "src/llm/base.py",
+    "src/effort/effort_estimator.py",
+    "src/effort/__init__.py",
+    "src/graph/__init__.py",
+    "src/graph/graph_builder.py",
+    "src/parser/__init__.py",
+    "src/parser/parser.py",
+    "src/architecture/analyzer.py",
+    "src/architecture/__init__.py",
+    "src/scanner/scanner.py",
+    "src/scanner/__init__.py",
+    "src/summarizer/flow_mapper.py",
+    "src/summarizer/__init__.py",
+    "src/summarizer/summarizer.py",
+    "src/impact/impact_analyzer.py",
+    "src/impact/__init__.py"
+  ]
+}

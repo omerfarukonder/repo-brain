@@ -1,0 +1,98 @@
+{
+  "__init__.py": {
+    "summary": "Based on the repository context, this module is responsible for initializing the `impact` package and its subpackage(s). It does not define any classes, functions, or imports, suggesting that it only serves as a \"namespace\" or a way to structure the package's contents."
+  },
+  "ui/__init__.py": {
+    "summary": "Based on the repository context, I can infer that this module serves as an initialization point for a UI-related package or module. The lack of classes, functions, and imports suggests that its primary responsibility is likely to initialize or configure some aspect of the UI system, potentially setting up paths or directories for subsequent code to use."
+  },
+  "ui/app.py": {
+    "summary": "Based on the repository context, this module appears to be responsible for handling user interface (UI) related tasks using Streamlit library and interacting with other modules such as OpenAI client, OllamaClient, RAGIndex, and RepoScanner. It provides functions like _load_json, _not_analyzed, _build_llm, and _build_rag which might be used to load JSON data, analyze code, build language models or related tasks."
+  },
+  "config/config.py": {
+    "summary": "Based on the repository context, this module (config/config.py) is responsible for managing configuration files and providing methods to find, retrieve, and reload configuration data. Specifically, it appears to use YAML files as the storage mechanism for configurations, allowing other parts of the system to access and update configuration settings."
+  },
+  "config/__init__.py": {
+    "summary": "Based on the repository context, this module appears to be responsible for initializing and configuring settings or parameters through the `get_config` function imported from the `config` package. Its primary role is likely to provide a single entry point for accessing configuration values, allowing other parts of the application to retrieve these settings as needed."
+  },
+  "tests/test_parser.py": {
+    "summary": "Based on the repository context, this module (`tests/test_parser.py`) is responsible for testing the `CodeParser` class from the `repobrain.src.parser.parser` module. It contains various test functions that verify the parser's functionality in parsing different types of code (e.g., Python functions, classes, imports) and writing the parsed results to JSON files."
+  },
+  "tests/test_scanner.py": {
+    "summary": "Based on the repository context, this module (tests/test_scanner.py) appears to be a test suite for the RepoScanner class located in src/scanner/scanner.py. The tests aim to verify the functionality of the scanner by detecting various programming languages and frameworks, skipping specific directories, writing JSON output, and counting locations."
+  },
+  "tests/__init__.py": {
+    "summary": "Based on the repository context, this module is responsible for initializing and setting up tests within a Python project. It likely serves as an entry point for test execution and provides a namespace for other test-related modules or files to import."
+  },
+  "tests/test_graph.py": {
+    "summary": "Based on the provided repository context, this module (`tests/test_graph.py`) appears to be a test suite for graph-related functionality, likely related to building and analyzing software architecture graphs. The tests verify that nodes are created correctly, edges are formed between nodes representing imports, self-loops do not occur, and centrality measures can be attached to nodes."
+  },
+  "cli/__init__.py": {
+    "summary": "Based on the repository context, this module (cli/__init__.py) appears to be responsible for setting up and configuring the command-line interface (CLI) functionality within the larger project structure. It likely provides a entry point for the CLI tools and utilities."
+  },
+  "cli/main.py": {
+    "summary": "Based on the repository context, this module (cli/main.py) appears to be responsible for providing a command-line interface (CLI) to analyze and process code-related data. It seems to utilize various modules and functions from the repository, such as _build_llm_client, _load_json, and CodeParser, to perform tasks like analyzing code structure and extracting relevant information."
+  },
+  "src/__init__.py": {
+    "summary": "Based on the repository context, this module (src/__init__.py) appears to be responsible for initializing and coordinating the parser module (src/parser/__init__.py), as it imports CodeParser from that module. This suggests that this module serves as a gateway or entry point for parsing-related functionality in the system."
+  },
+  "src/llm/ollama_client.py": {
+    "summary": "Based on the repository context, this module (OllamaClient) appears to be a client for interacting with an Large Language Model (LLM) called \"Ollama\". The `__init__` function likely initializes the client, and the `complete` function seems to handle completing tasks or queries using the Ollama LLM."
+  },
+  "src/llm/__init__.py": {
+    "summary": "Based on the repository context, this module (src/llm/__init__.py) appears to be an initialization point for a library or framework related to Large Language Models (LLMs). It likely provides an entry point for other modules and classes in the src/llm namespace."
+  },
+  "src/llm/rag.py": {
+    "summary": "Based on the repository context, this module (src/llm/rag.py) appears to be responsible for building and querying a Retrieval-Augmented Generator (RAG) index. It provides functions for initializing and building the RAG index, as well as querying it to retrieve relevant information. The module also imports necessary libraries from sentence transformers and chromadb, suggesting that it is used in conjunction with natural language processing tasks."
+  },
+  "src/llm/openai_client.py": {
+    "summary": "Based on the repository context, this module (`src/llm/openai_client.py`) appears to be responsible for interacting with the OpenAI API, providing an interface for completing tasks through the `complete` function. It inherits from the `LLMClient` class in the `base.py` file and utilizes the `OpenAI` class from the openai library."
+  },
+  "src/llm/base.py": {
+    "summary": "Based on the repository context, this module (`src/llm/base.py`) appears to provide a foundation for interacting with Large Language Models (LLMs) through its `LLMClient` class. The `complete` function suggests that it might offer some kind of completion or suggestion feature related to LLMs."
+  },
+  "src/effort/effort_estimator.py": {
+    "summary": "Based on the provided repository context, this module (src/effort/effort_estimator.py) appears to be responsible for estimating effort related to certain tasks or projects. It seems to use networkx library to perform some kind of graph analysis and possibly interacts with file system using pathlib. The main functionality is implemented in the \"estimate\" function within the EffortEstimator class."
+  },
+  "src/effort/__init__.py": {
+    "summary": "Based on the repository context, this module (src/effort/__init__.py) is likely a package initializer that sets up an empty namespace for other modules to import and use. Its responsibility is to provide a foundation or entry point for the effort estimation functionality implemented in src/effort/effort_estimator.py."
+  },
+  "src/graph/__init__.py": {
+    "summary": "Based on the repository context, this module (`src/graph/__init__.py`) is responsible for initializing and configuring graph-related functionality, likely involving the construction of graphs and their analysis. Specifically, it imports a `GraphBuilder` class from the same package, suggesting that it plays a role in setting up graph-building processes."
+  },
+  "src/graph/graph_builder.py": {
+    "summary": "Based on the repository context, this module (src/graph/graph_builder.py) appears to be responsible for building and manipulating graph structures, specifically working with imports and modules. It likely takes in some input data or configuration and uses libraries like NetworkX and Graphviz to create and render graphs, possibly in various formats such as PNG or GraphML."
+  },
+  "src/parser/__init__.py": {
+    "summary": "Based on the repository context, this module (src/parser/__init__.py) appears to be responsible for initializing and possibly configuring a CodeParser instance, as indicated by the import statement `from .parser import CodeParser`. This suggests that it may serve as an entry point or container for code parsing-related functionality."
+  },
+  "src/parser/parser.py": {
+    "summary": "Based on the repository context, it appears that this module is responsible for parsing code and extracting comments from different programming languages, including Python and JavaScript. The CodeParser class seems to be the primary interface for performing these tasks."
+  },
+  "src/architecture/analyzer.py": {
+    "summary": "Based on the repository context, the ArchitectureAnalyzer module is responsible for analyzing and processing architecture-related information. It provides functionality for classifying modules, detecting patterns, building Mermaid diagrams, and analyzing architectural data. The module likely plays a crucial role in understanding and visualizing software architecture within the larger repobrain framework."
+  },
+  "src/architecture/__init__.py": {
+    "summary": "Based on the repository context, this module serves as a package initializer for the `architecture` namespace within the project. It does not define any classes, functions, or imports, suggesting its primary responsibility is to provide a namespace for other modules and code organization purposes."
+  },
+  "src/scanner/scanner.py": {
+    "summary": "Based on the repository context, this module (src/scanner/scanner.py) appears to be responsible for scanning a repository and detecting certain characteristics about it, such as frameworks or languages used. It seems to have methods for skipping directories and detecting specific frameworks, and also writes its findings to JSON."
+  },
+  "src/scanner/__init__.py": {
+    "summary": "Based on the repository context, this module appears to be responsible for scanning a repository and detecting certain frameworks or structures within it. It does so by importing a `RepoScanner` class from its own `scanner` module, which is likely responsible for performing the actual scanning and detection. The module's purpose is likely to integrate with other parts of the system that utilize the scanner functionality."
+  },
+  "src/summarizer/flow_mapper.py": {
+    "summary": "Based on the repository context, this module (src/summarizer/flow_mapper.py) appears to be responsible for mapping and summarizing flows or structures within a system or network. The presence of NetworkX imports suggests that it may be working with graph-like data, and the BFS flow function implies a traversal-based approach to understanding these flows."
+  },
+  "src/summarizer/__init__.py": {
+    "summary": "Based on the repository context, this module appears to be responsible for summarizing code content. The presence of a `summarizer.py` file with a `ModuleSummarizer` class and a `summarize_all` function suggests that it is designed to analyze and condense code into a more concise form."
+  },
+  "src/summarizer/summarizer.py": {
+    "summary": "Based on the repository context, this module (src/summarizer/summarizer.py) appears to be responsible for summarizing code data using large language models (LLMs). The summarize_all function seems to utilize an LLMClient and RAGIndex to generate summaries. The module also imports json and Path from pathlib, suggesting that it may write or read JSON files and interact with file systems."
+  },
+  "src/impact/impact_analyzer.py": {
+    "summary": "Based on the repository context, this module (src/impact/impact_analyzer.py) appears to be responsible for analyzing the impact of code changes. It likely takes input in some format (perhaps JSON) and uses techniques such as graph theory and language models to assess the effects of those changes. The `analyze` function is likely the entry point for this analysis, and it may utilize other imported modules and classes to perform its task."
+  },
+  "src/impact/__init__.py": {
+    "summary": "Based on the repository context, it appears that this module is responsible for serving as an initialization point for the \"impact\" package within the larger \"src\" package. Its purpose is likely to provide a namespace or entry point for other modules or functions within the \"impact\" package."
+  }
+}

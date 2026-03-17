@@ -1,0 +1,21 @@
+{
+  "complexity": "High",
+  "effort_range": "5-10 days",
+  "testing_effort": "2-3 days",
+  "confidence": "80%",
+  "layers_touched": [
+    "AI",
+    "API",
+    "Config",
+    "Graph",
+    "Parser",
+    "Service"
+  ],
+  "scores": {
+    "files_score": 28,
+    "layer_score": 18,
+    "dependency_score": 5.46,
+    "centrality_score": 0.02,
+    "total": 51.49
+  }
+}

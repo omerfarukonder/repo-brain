@@ -1,0 +1,8 @@
+llm_provider: local   # local | openai
+model: llama3
+openai_api_key: ""
+openai_model: gpt-4o
+ollama_base_url: http://localhost:11434
+embedding_model: all-MiniLM-L6-v2
+chroma_persist_dir: ./.chroma
+analysis_output_dir: ./analysis

@@ -1,0 +1,23 @@
+{
+  "change_description": "changing main.py's file name by adding \"_1\" to the end of them\n",
+  "seed_modules": [
+    "cli/main.py"
+  ],
+  "affected_modules": [
+    "cli/main.py",
+    "config/config.py",
+    "src/architecture/analyzer.py",
+    "src/effort/effort_estimator.py",
+    "src/graph/graph_builder.py",
+    "src/impact/impact_analyzer.py",
+    "src/llm/base.py",
+    "src/llm/ollama_client.py",
+    "src/llm/openai_client.py",
+    "src/llm/rag.py",
+    "src/parser/parser.py",
+    "src/scanner/scanner.py",
+    "src/summarizer/flow_mapper.py",
+    "src/summarizer/summarizer.py"
+  ],
+  "total_affected": 14
+}

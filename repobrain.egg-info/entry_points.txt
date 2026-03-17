@@ -1,0 +1,2 @@
+[console_scripts]
+repobrain = repobrain.cli.main:cli
