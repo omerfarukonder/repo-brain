@@ -82,7 +82,17 @@ with st.sidebar:
                 graph = GraphBuilder().build(parsed, repo_path)
                 ArchitectureAnalyzer().analyze(graph, parsed, repo_path)
                 rag = RAGIndex(persist_dir=chroma_dir, embedding_model=embedding_model)
-                rag.build(parsed)
+                rag.build(parsed, repo_path)
+
+                # Summarize modules using selected LLM
+                from repobrain.src.summarizer.summarizer import ModuleSummarizer
+                llm = _build_llm(
+                    "openai" if use_openai else "local",
+                    api_key,
+                    llm_model,
+                )
+                ModuleSummarizer().summarize_all(parsed, rag, llm, repo_path)
+
                 st.success("Analysis complete!")
                 st.rerun()
             except Exception as e:
@@ -189,6 +199,8 @@ with tab_arch:
                     directed=True,
                     physics=True,
                     hierarchical=False,
+                    node={"font": {"color": "#ffffff"}},
+                    edge={"color": "#888888"},
                 )
 
                 if nodes:
@@ -224,13 +236,17 @@ with tab_arch:
 with tab_deps:
     st.header("Dependency Graph")
     png_path = analysis_dir / "dependency_graph.png"
-    if not png_path.exists():
+    graphml = analysis_dir / "dependency_graph.graphml"
+
+    if not graphml.exists() and not png_path.exists():
         _not_analyzed()
     else:
-        st.image(str(png_path), use_container_width=True)
+        if png_path.exists():
+            st.image(str(png_path), use_container_width=True)
+        elif graphml.exists():
+            st.info("PNG not available (graphviz not installed). Showing data from GraphML.")
 
         # Top modules by centrality
-        graphml = analysis_dir / "dependency_graph.graphml"
         if graphml.exists():
             import networkx as nx
             g = nx.read_graphml(str(graphml))
@@ -336,12 +352,12 @@ with tab_impact:
                         change_desc, graph, parsed, rag, llm, repo_path
                     )
                     effort = EffortEstimator().estimate(
-                        impact_report, graph, arch, repo_path
+                        impact_report, graph, arch, repo_path, llm=llm
                     )
 
                     # Effort card
                     complexity = effort["complexity"]
-                    badge_color = {"Low": "green", "Medium": "orange", "High": "red"}.get(complexity, "gray")
+                    badge_color = {"Trivial": "#00bcd4", "Low": "green", "Medium": "orange", "High": "red"}.get(complexity, "gray")
                     st.markdown(
                         f"### Complexity: "
                         f"<span style='color:{badge_color}; font-weight:bold'>{complexity}</span>",
@@ -355,6 +371,12 @@ with tab_impact:
 
                     st.markdown("**Layers touched:** " + ", ".join(effort["layers_touched"] or ["unknown"]))
 
+                    # Show LLM reasoning if available
+                    llm_reasoning = effort.get("scores", {}).get("llm_reasoning", "")
+                    if llm_reasoning:
+                        llm_diff = effort.get("scores", {}).get("llm_difficulty", "")
+                        st.markdown(f"**AI Assessment** (difficulty {llm_diff}/10): {llm_reasoning}")
+
                     st.markdown("---")
                     col_seed, col_affected = st.columns(2)
                     with col_seed:
@@ -365,6 +387,30 @@ with tab_impact:
                         st.subheader(f"All Affected Modules ({impact_report['total_affected']})")
                         for m in impact_report["affected_modules"]:
                             st.markdown(f"- `{m}`")
+
+                    # Edit steps with code snippets
+                    edit_steps = impact_report.get("edit_steps", [])
+                    if edit_steps:
+                        st.markdown("---")
+                        st.subheader("Suggested Edit Steps")
+                        for i, step in enumerate(edit_steps, 1):
+                            action = step.get("action", "edit").upper()
+                            file = step.get("file", "")
+                            desc = step.get("description", "")
+                            before = step.get("before", "")
+                            after = step.get("after", "")
+
+                            with st.expander(f"Step {i}: `{file}` — **{action}**", expanded=True):
+                                st.markdown(desc)
+
+                                if before or after:
+                                    col_before, col_after = st.columns(2)
+                                    with col_before:
+                                        st.markdown("**Before:**")
+                                        st.code(before if before else "(no existing code)", language="python")
+                                    with col_after:
+                                        st.markdown("**After:**")
+                                        st.code(after if after else "(removed)", language="python")
 
             except Exception as e:
                 st.error(f"Error: {e}")

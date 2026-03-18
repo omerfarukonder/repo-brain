@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d2" for="node" attr.name="degree_centrality" attr.type="double"/>
+<key id="d1" for="node" attr.name="betweenness_centrality" attr.type="double"/>
+<key id="d0" for="node" attr.name="label" attr.type="string"/>
+<graph edgedefault="directed"><node id="repobrain/src/summarizer/summarizer.py">
+  <data key="d0">repobrain.src.summarizer.summarizer</data>
+  <data key="d1">0.0005376344086021505</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/src/scanner/scanner.py">
+  <data key="d0">repobrain.src.scanner.scanner</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/src/parser/__init__.py">
+  <data key="d0">repobrain.src.parser.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/effort/effort_estimator.py">
+  <data key="d0">repobrain.src.effort.effort_estimator</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.06451612903225806</data>
+</node>
+<node id="repobrain/src/architecture/__init__.py">
+  <data key="d0">repobrain.src.architecture.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/src/llm/rag.py">
+  <data key="d0">repobrain.src.llm.rag</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/src/impact/impact_analyzer.py">
+  <data key="d0">repobrain.src.impact.impact_analyzer</data>
+  <data key="d1">0.0005376344086021505</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/cli/main.py">
+  <data key="d0">repobrain.cli.main</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.3870967741935484</data>
+</node>
+<node id="repobrain/src/llm/base.py">
+  <data key="d0">repobrain.src.llm.base</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/src/scanner/__init__.py">
+  <data key="d0">repobrain.src.scanner.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/__init__.py">
+  <data key="d0">repobrain.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/config/config.py">
+  <data key="d0">repobrain.config.config</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.06451612903225806</data>
+</node>
+<node id="repobrain/src/graph/graph_builder.py">
+  <data key="d0">repobrain.src.graph.graph_builder</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/tests/test_graph.py">
+  <data key="d0">repobrain.tests.test_graph</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/llm/ollama_client.py">
+  <data key="d0">repobrain.src.llm.ollama_client</data>
+  <data key="d1">0.0005376344086021505</data>
+  <data key="d2">0.0967741935483871</data>
+</node>
+<node id="repobrain/src/summarizer/flow_mapper.py">
+  <data key="d0">repobrain.src.summarizer.flow_mapper</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/__init__.py">
+  <data key="d0">repobrain.src.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/cli/__init__.py">
+  <data key="d0">repobrain.cli.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/tests/test_parser.py">
+  <data key="d0">repobrain.tests.test_parser</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/impact/__init__.py">
+  <data key="d0">repobrain.src.impact.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/src/parser/parser.py">
+  <data key="d0">repobrain.src.parser.parser</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.12903225806451613</data>
+</node>
+<node id="repobrain/src/architecture/analyzer.py">
+  <data key="d0">repobrain.src.architecture.analyzer</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.06451612903225806</data>
+</node>
+<node id="repobrain/src/summarizer/__init__.py">
+  <data key="d0">repobrain.src.summarizer.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/src/llm/__init__.py">
+  <data key="d0">repobrain.src.llm.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/ui/app.py">
+  <data key="d0">repobrain.ui.app</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.3225806451612903</data>
+</node>
+<node id="repobrain/tests/__init__.py">
+  <data key="d0">repobrain.tests.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/src/llm/openai_client.py">
+  <data key="d0">repobrain.src.llm.openai_client</data>
+  <data key="d1">0.0005376344086021505</data>
+  <data key="d2">0.0967741935483871</data>
+</node>
+<node id="repobrain/config/__init__.py">
+  <data key="d0">repobrain.config.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/effort/__init__.py">
+  <data key="d0">repobrain.src.effort.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/ui/__init__.py">
+  <data key="d0">repobrain.ui.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.0</data>
+</node>
+<node id="repobrain/tests/test_scanner.py">
+  <data key="d0">repobrain.tests.test_scanner</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<node id="repobrain/src/graph/__init__.py">
+  <data key="d0">repobrain.src.graph.__init__</data>
+  <data key="d1">0.0</data>
+  <data key="d2">0.03225806451612903</data>
+</node>
+<edge source="repobrain/src/summarizer/summarizer.py" target="repobrain/src/llm/base.py"/>
+<edge source="repobrain/src/summarizer/summarizer.py" target="repobrain/src/llm/rag.py"/>
+<edge source="repobrain/src/parser/__init__.py" target="repobrain/src/parser/parser.py"/>
+<edge source="repobrain/src/impact/impact_analyzer.py" target="repobrain/src/llm/base.py"/>
+<edge source="repobrain/src/impact/impact_analyzer.py" target="repobrain/src/llm/rag.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/config/config.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/scanner/scanner.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/parser/parser.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/graph/graph_builder.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/architecture/analyzer.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/llm/rag.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/summarizer/summarizer.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/summarizer/flow_mapper.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/impact/impact_analyzer.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/effort/effort_estimator.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/llm/openai_client.py"/>
+<edge source="repobrain/cli/main.py" target="repobrain/src/llm/ollama_client.py"/>
+<edge source="repobrain/src/scanner/__init__.py" target="repobrain/src/scanner/scanner.py"/>
+<edge source="repobrain/tests/test_graph.py" target="repobrain/src/graph/graph_builder.py"/>
+<edge source="repobrain/src/llm/ollama_client.py" target="repobrain/src/llm/base.py"/>
+<edge source="repobrain/tests/test_parser.py" target="repobrain/src/parser/parser.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/llm/openai_client.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/llm/ollama_client.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/llm/rag.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/scanner/scanner.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/parser/parser.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/graph/graph_builder.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/architecture/analyzer.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/summarizer/summarizer.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/impact/impact_analyzer.py"/>
+<edge source="repobrain/ui/app.py" target="repobrain/src/effort/effort_estimator.py"/>
+<edge source="repobrain/src/llm/openai_client.py" target="repobrain/src/llm/base.py"/>
+<edge source="repobrain/config/__init__.py" target="repobrain/config/config.py"/>
+<edge source="repobrain/tests/test_scanner.py" target="repobrain/src/scanner/scanner.py"/>
+<edge source="repobrain/src/graph/__init__.py" target="repobrain/src/graph/graph_builder.py"/>
+</graph></graphml>

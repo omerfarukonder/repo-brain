@@ -1,20 +1,20 @@
 {
   "files": {
-    "__init__.py": {
+    "repobrain/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "ui/__init__.py": {
+    "repobrain/ui/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "ui/app.py": {
+    "repobrain/ui/app.py": {
       "language": "Python",
       "functions": [
         "_load_json",
@@ -36,6 +36,7 @@
         "from repobrain.src.graph.graph_builder import GraphBuilder",
         "from repobrain.src.architecture.analyzer import ArchitectureAnalyzer",
         "from repobrain.src.llm.rag import RAGIndex",
+        "from repobrain.src.summarizer.summarizer import ModuleSummarizer",
         "from streamlit_agraph import agraph, Node, Edge, Config",
         "import networkx as nx",
         "import networkx as nx",
@@ -58,6 +59,10 @@
           "detected_language": "unknown"
         },
         {
+          "text": "Summarize modules using selected LLM",
+          "detected_language": "en"
+        },
+        {
           "text": "\u2500\u2500 main tabs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
           "detected_language": "unknown"
         },
@@ -71,7 +76,7 @@
         },
         {
           "text": "Build nodes",
-          "detected_language": "fr",
+          "detected_language": "de",
           "translated_comment": "# [Translation needed]: Build nodes"
         },
         {
@@ -108,7 +113,7 @@
         }
       ]
     },
-    "config/config.py": {
+    "repobrain/config/config.py": {
       "language": "Python",
       "functions": [
         "_find_config_file",
@@ -139,7 +144,7 @@
         }
       ]
     },
-    "config/__init__.py": {
+    "repobrain/config/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
@@ -148,7 +153,7 @@
       ],
       "comments": []
     },
-    "tests/test_parser.py": {
+    "repobrain/tests/test_parser.py": {
       "language": "Python",
       "functions": [
         "_make_repo",
@@ -177,7 +182,7 @@
         }
       ]
     },
-    "tests/test_scanner.py": {
+    "repobrain/tests/test_scanner.py": {
       "language": "Python",
       "functions": [
         "_make_repo",
@@ -204,14 +209,14 @@
         }
       ]
     },
-    "tests/__init__.py": {
+    "repobrain/tests/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "tests/test_graph.py": {
+    "repobrain/tests/test_graph.py": {
       "language": "Python",
       "functions": [
         "_parsed_code",
@@ -238,14 +243,14 @@
         }
       ]
     },
-    "cli/__init__.py": {
+    "repobrain/cli/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "cli/main.py": {
+    "repobrain/cli/main.py": {
       "language": "Python",
       "functions": [
         "_build_llm_client",
@@ -289,8 +294,7 @@
         },
         {
           "text": "3. Build dependency graph",
-          "detected_language": "nl",
-          "translated_comment": "# [Translation needed]: 3. Build dependency graph"
+          "detected_language": "en"
         },
         {
           "text": "4. Analyze architecture",
@@ -344,14 +348,14 @@
         }
       ]
     },
-    "src/__init__.py": {
+    "repobrain/src/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "src/llm/ollama_client.py": {
+    "repobrain/src/llm/ollama_client.py": {
       "language": "Python",
       "functions": [
         "__init__",
@@ -371,14 +375,14 @@
         }
       ]
     },
-    "src/llm/__init__.py": {
+    "repobrain/src/llm/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "src/llm/rag.py": {
+    "repobrain/src/llm/rag.py": {
       "language": "Python",
       "functions": [
         "__init__",
@@ -428,7 +432,7 @@
         }
       ]
     },
-    "src/llm/openai_client.py": {
+    "repobrain/src/llm/openai_client.py": {
       "language": "Python",
       "functions": [
         "__init__",
@@ -448,7 +452,7 @@
         }
       ]
     },
-    "src/llm/base.py": {
+    "repobrain/src/llm/base.py": {
       "language": "Python",
       "functions": [
         "complete"
@@ -470,7 +474,7 @@
         }
       ]
     },
-    "src/effort/effort_estimator.py": {
+    "repobrain/src/effort/effort_estimator.py": {
       "language": "Python",
       "functions": [
         "estimate"
@@ -521,14 +525,14 @@
         }
       ]
     },
-    "src/effort/__init__.py": {
+    "repobrain/src/effort/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "src/graph/__init__.py": {
+    "repobrain/src/graph/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
@@ -537,7 +541,7 @@
       ],
       "comments": []
     },
-    "src/graph/graph_builder.py": {
+    "repobrain/src/graph/graph_builder.py": {
       "language": "Python",
       "functions": [
         "_module_name",
@@ -654,7 +658,7 @@
         }
       ]
     },
-    "src/parser/__init__.py": {
+    "repobrain/src/parser/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
@@ -663,7 +667,7 @@
       ],
       "comments": []
     },
-    "src/parser/parser.py": {
+    "repobrain/src/parser/parser.py": {
       "language": "Python",
       "functions": [
         "_extract_comments_python",
@@ -751,8 +755,7 @@
         },
         {
           "text": "Main parser class",
-          "detected_language": "fr",
-          "translated_comment": "# [Translation needed]: Main parser class"
+          "detected_language": "en"
         },
         {
           "text": "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
@@ -760,7 +763,7 @@
         },
         {
           "text": "Persist result",
-          "detected_language": "ca",
+          "detected_language": "ro",
           "translated_comment": "# [Translation needed]: Persist result"
         },
         {
@@ -813,7 +816,7 @@
         }
       ]
     },
-    "src/architecture/analyzer.py": {
+    "repobrain/src/architecture/analyzer.py": {
       "language": "Python",
       "functions": [
         "_classify_module",
@@ -869,14 +872,14 @@
         }
       ]
     },
-    "src/architecture/__init__.py": {
+    "repobrain/src/architecture/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "src/scanner/scanner.py": {
+    "repobrain/src/scanner/scanner.py": {
       "language": "Python",
       "functions": [
         "_skip_dir",
@@ -911,7 +914,7 @@
         },
         {
           "text": "Java / Maven",
-          "detected_language": "hr",
+          "detected_language": "sl",
           "translated_comment": "# [Translation needed]: Java / Maven"
         },
         {
@@ -936,8 +939,7 @@
         },
         {
           "text": "Persist result",
-          "detected_language": "ro",
-          "translated_comment": "# [Translation needed]: Persist result"
+          "detected_language": "en"
         },
         {
           "text": "Return True if this directory should be skipped during scanning.",
@@ -957,7 +959,7 @@
         }
       ]
     },
-    "src/scanner/__init__.py": {
+    "repobrain/src/scanner/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
@@ -966,7 +968,7 @@
       ],
       "comments": []
     },
-    "src/summarizer/flow_mapper.py": {
+    "repobrain/src/summarizer/flow_mapper.py": {
       "language": "Python",
       "functions": [
         "map_flows",
@@ -999,14 +1001,14 @@
         }
       ]
     },
-    "src/summarizer/__init__.py": {
+    "repobrain/src/summarizer/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],
       "imports": [],
       "comments": []
     },
-    "src/summarizer/summarizer.py": {
+    "repobrain/src/summarizer/summarizer.py": {
       "language": "Python",
       "functions": [
         "summarize_all"
@@ -1031,7 +1033,7 @@
         }
       ]
     },
-    "src/impact/impact_analyzer.py": {
+    "repobrain/src/impact/impact_analyzer.py": {
       "language": "Python",
       "functions": [
         "analyze",
@@ -1084,7 +1086,7 @@
         }
       ]
     },
-    "src/impact/__init__.py": {
+    "repobrain/src/impact/__init__.py": {
       "language": "Python",
       "functions": [],
       "classes": [],

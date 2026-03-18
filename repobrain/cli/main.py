@@ -101,7 +101,7 @@ def analyze(repo_path: str):
     # 5. Build RAG index
     click.echo("\nBuilding knowledge index...")
     rag = _build_rag(cfg)
-    rag.build(parsed)
+    rag.build(parsed, repo_path)
     click.echo("  Knowledge index built")
 
     # 6. Summarize modules
@@ -222,7 +222,7 @@ def impact(change_description: str):
     impact_report = analyzer.analyze(change_description, graph, parsed, rag, llm, ".")
 
     estimator = EffortEstimator()
-    effort = estimator.estimate(impact_report, graph, arch, ".")
+    effort = estimator.estimate(impact_report, graph, arch, ".", llm=llm)
 
     click.echo(f"Seed modules identified : {len(impact_report['seed_modules'])}")
     for m in impact_report["seed_modules"]:

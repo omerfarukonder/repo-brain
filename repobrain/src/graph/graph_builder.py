@@ -138,8 +138,9 @@ def _render_png(graph: nx.DiGraph, output_path: Path) -> None:
         return
     try:
         dot = gv.Digraph(format="png")
-        dot.attr(rankdir="LR", size="20,20")
-        dot.attr("node", shape="box", fontsize="10", style="filled", fillcolor="#e8f4f8")
+        dot.attr(rankdir="LR", size="20,20", bgcolor="#0e1117")
+        dot.attr("node", shape="box", fontsize="10", style="filled", fillcolor="#262730", fontcolor="white", color="#444444")
+        dot.attr("edge", color="#888888", fontcolor="white")
 
         for node in graph.nodes:
             label = graph.nodes[node].get("label", node)

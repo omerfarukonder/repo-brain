@@ -35,7 +35,7 @@ class ImpactAnalyzer:
         context = "\n---\n".join(context_chunks) if context_chunks else "No context available."
 
         all_files = list(parsed_code.get("files", {}).keys())
-        files_list = "\n".join(f"- {f}" for f in all_files[:50])
+        files_list = "\n".join(f"- {f}" for f in all_files)
 
         prompt = (
             f"You are a code analysis assistant. Given the repository context below, "
@@ -52,20 +52,89 @@ class ImpactAnalyzer:
         raw = llm.complete(prompt)
         seed_modules = _parse_json_array(raw)
 
-        # Validate against actual files
+        # Validate against actual files (with fuzzy matching on partial paths)
         valid_files = set(parsed_code.get("files", {}).keys())
-        seed_modules = [f for f in seed_modules if f in valid_files]
+        matched_modules = []
+        for candidate in seed_modules:
+            if candidate in valid_files:
+                matched_modules.append(candidate)
+            else:
+                # Try partial match: LLM might return "app.py" when key is "src/app.py"
+                for vf in valid_files:
+                    if vf.endswith("/" + candidate) or vf.endswith(candidate):
+                        matched_modules.append(vf)
+                        break
+        seed_modules = matched_modules
 
-        # BFS traversal: successors (downstream) and predecessors (upstream)
+        # Traversal: direct neighbors only (1 hop) to avoid over-inflation
         affected: set[str] = set(seed_modules)
         for seed in seed_modules:
             if graph.has_node(seed):
-                # downstream: modules that import seed
-                for node in nx.descendants(graph, seed):
+                # downstream: direct dependents (modules that import seed)
+                for node in graph.successors(seed):
                     affected.add(node)
-                # upstream: modules that seed imports from
-                for node in nx.ancestors(graph, seed):
+                # upstream: direct dependencies (modules that seed imports)
+                for node in graph.predecessors(seed):
                     affected.add(node)
+
+        affected_list = sorted(affected)
+
+        # Generate concrete edit steps with code snippets — one LLM call per seed file
+        # We call per-file so the LLM can focus on the actual source and produce
+        # accurate before/after code snippets.
+        edit_steps = []
+        if seed_modules:
+            root = Path(repo_path).resolve()
+            for seed_file in seed_modules:
+                # Read actual source code for precise snippets
+                source = ""
+                try:
+                    file_path = root / seed_file
+                    if file_path.exists():
+                        source = file_path.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    pass
+
+                if not source:
+                    file_chunks = rag.query(f"file {seed_file}", top_k=1)
+                    source = file_chunks[0] if file_chunks else "Source not available."
+
+                # Truncate very large files to keep prompt manageable
+                if len(source) > 6000:
+                    source = source[:6000] + "\n... (truncated)"
+
+                step_prompt = (
+                    f"You are a code editing assistant. Given the change request and the full source code, "
+                    f"provide edit steps WITH code snippets showing exactly what to change.\n\n"
+                    f"Change request: \"{change_description}\"\n"
+                    f"File: {seed_file}\n\n"
+                    f"Current source code:\n```\n{source}\n```\n\n"
+                    f"Return a JSON array. Each step must have:\n"
+                    f"- \"file\": the file path\n"
+                    f"- \"action\": \"change\", \"add\", or \"remove\"\n"
+                    f"- \"description\": short explanation of what to do\n"
+                    f"- \"before\": the existing code snippet that needs to change (exact lines from source). "
+                    f"For \"add\" actions, this is the code AFTER which the new code should be inserted. "
+                    f"For \"remove\" actions, this is the code to delete.\n"
+                    f"- \"after\": the replacement code snippet. For \"add\" actions, include the anchor line "
+                    f"plus the new code. For \"remove\" actions, set to empty string.\n\n"
+                    f"Example:\n"
+                    f"[{{\n"
+                    f"  \"file\": \"models.py\",\n"
+                    f"  \"action\": \"add\",\n"
+                    f"  \"description\": \"Add month-over-month change field to TrendingKeyword\",\n"
+                    f"  \"before\": \"    trend_rate: float = 0.0\",\n"
+                    f"  \"after\": \"    trend_rate: float = 0.0\\n    mom_change: float | None = None\"\n"
+                    f"}}]\n\n"
+                    f"Rules:\n"
+                    f"- Maximum 3 steps per file. Combine tiny related edits.\n"
+                    f"- The \"before\" snippet MUST be exact text from the source code above.\n"
+                    f"- Keep snippets focused — only the lines that change plus 1-2 lines of context.\n"
+                    f"- Only include changes that are directly needed for the change request."
+                )
+                raw_steps = llm.complete(step_prompt)
+                parsed_steps = _parse_json_array_of_objects(raw_steps)
+                edit_steps.extend(parsed_steps)
 
         affected_list = sorted(affected)
 
@@ -74,6 +143,7 @@ class ImpactAnalyzer:
             "seed_modules": seed_modules,
             "affected_modules": affected_list,
             "total_affected": len(affected_list),
+            "edit_steps": edit_steps,
         }
 
         root = Path(repo_path).resolve()
@@ -87,13 +157,25 @@ class ImpactAnalyzer:
 
 def _parse_json_array(text: str) -> list[str]:
     """Extract a JSON array of strings from LLM output."""
-    # Try to find a JSON array in the response
     match = re.search(r"\[.*?\]", text, re.DOTALL)
     if match:
         try:
             parsed = json.loads(match.group())
             if isinstance(parsed, list):
                 return [str(item) for item in parsed if item]
+        except json.JSONDecodeError:
+            pass
+    return []
+
+
+def _parse_json_array_of_objects(text: str) -> list[dict]:
+    """Extract a JSON array of objects from LLM output."""
+    match = re.search(r"\[.*\]", text, re.DOTALL)
+    if match:
+        try:
+            parsed = json.loads(match.group())
+            if isinstance(parsed, list):
+                return [item for item in parsed if isinstance(item, dict)]
         except json.JSONDecodeError:
             pass
     return []

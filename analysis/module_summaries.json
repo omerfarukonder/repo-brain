@@ -1,0 +1,98 @@
+{
+  "repobrain/__init__.py": {
+    "summary": "The `repobrain/__init__.py` module appears to be an empty package initializer for the `repobrain` package. Based on the provided context, it does not define any classes, functions, imports, or visible package-level behavior."
+  },
+  "repobrain/ui/__init__.py": {
+    "summary": "The `repobrain/ui/__init__.py` module appears to be an empty package initializer for the `repobrain.ui` package. Based on the provided context, it does not define any classes, functions, imports, or behavior, and likely exists only to mark the directory as a Python package."
+  },
+  "repobrain/ui/app.py": {
+    "summary": "This module appears to be the Streamlit UI entry point for the application, wiring together repository analysis and LLM-backed retrieval components. Based on its imports and helper functions, it likely loads JSON data, detects whether a repository has been analyzed, and constructs either an OpenAI/Ollama client and a RAG index using scanned repository data."
+  },
+  "repobrain/config/config.py": {
+    "summary": "This module appears to manage configuration loading for the package. Based on its functions and imports, it likely locates a configuration file, loads/parses it as YAML, and provides access to the loaded configuration, with support for reloading it."
+  },
+  "repobrain/config/__init__.py": {
+    "summary": "This module serves as the package initializer for `repobrain.config`. Its only role shown here is to import `get_config` from `.config`, likely making that function available directly from the `repobrain.config` package namespace."
+  },
+  "repobrain/tests/test_parser.py": {
+    "summary": "This module contains tests for the `CodeParser` in `repobrain.src.parser.parser`. It builds temporary sample repositories and verifies that parsing handles Python functions, classes, and imports, supports JavaScript, skips unknown file extensions, and can write its output to JSON."
+  },
+  "repobrain/tests/test_scanner.py": {
+    "summary": "This module contains tests for `RepoScanner`, using temporary repositories created by `_make_repo` to verify its scanning behavior. The tests check that scanning detects Python files, identifies an entry point and FastAPI usage, skips `.git` directories, writes JSON output, and counts lines of code."
+  },
+  "repobrain/tests/__init__.py": {
+    "summary": "`repobrain/tests/__init__.py` appears to be an empty package initializer for the `repobrain.tests` test package. It does not define any code itself; its role is likely just to mark the `tests` directory as a Python package so test modules like `test_scanner.py` can live under it."
+  },
+  "repobrain/tests/test_graph.py": {
+    "summary": "`repobrain/tests/test_graph.py` is a test module for the graph-building functionality implemented by `GraphBuilder`. It appears to verify that graphs are created with the expected nodes and import-based edges, avoid self-loops, can be written as GraphML, and have centrality metadata attached, using helpers to construct parsed code and file metadata fixtures."
+  },
+  "repobrain/cli/__init__.py": {
+    "summary": "The `repobrain/cli/__init__.py` module appears to be an empty package initializer for the `repobrain.cli` package. Based on the provided context, it does not define any classes, functions, imports, or observable behavior beyond marking the directory as a Python package."
+  },
+  "repobrain/cli/main.py": {
+    "summary": "This module appears to implement the command-line entry point for the repository, using `click` to define commands such as `analyze`, `architecture`, `ask`, and `impact`. It likely coordinates configuration loading, repository scanning/parsing, graph construction or loading, and helper setup through functions like `_build_llm_client`, `_build_rag`, `_load_json`, and `_sep`."
+  },
+  "repobrain/src/__init__.py": {
+    "summary": "This module appears to be an empty package initializer for the `repobrain.src` package. Based on the provided context, it defines no classes, functions, imports, or visible behavior, and likely exists only to mark the directory as a Python package."
+  },
+  "repobrain/src/llm/ollama_client.py": {
+    "summary": "`repobrain/src/llm/ollama_client.py` defines an `OllamaClient` class that serves as an LLM client implementation for Ollama. Based on its imports and parallel structure to `openai_client.py`, it likely subclasses `LLMClient`, initializes connection/configuration in `__init__`, and provides a `complete` method that sends completion requests via the `requests` library."
+  },
+  "repobrain/src/llm/__init__.py": {
+    "summary": "Unable to determine from repository analysis."
+  },
+  "repobrain/src/llm/rag.py": {
+    "summary": "This module defines a `RAGIndex` class for retrieval-augmented generation support. Based on its imports and methods, it likely manages a ChromaDB-backed vector collection, uses `SentenceTransformer` to create embeddings, can build the index, run queries against it, and report whether the index has already been built."
+  },
+  "repobrain/src/llm/openai_client.py": {
+    "summary": "`repobrain/src/llm/openai_client.py` defines an `OpenAIClient` class that appears to implement the repository\u2019s shared `LLMClient` interface using the `openai.OpenAI` SDK. Based on its `__init__` and `complete` methods and its use in `ui/app.py`, its responsibility is likely to initialize an OpenAI-backed client and provide text completion functionality for the app\u2019s LLM layer."
+  },
+  "repobrain/src/llm/base.py": {
+    "summary": "This module defines an abstract base class, `LLMClient`, using Python\u2019s `ABC` infrastructure. Its responsibility appears to be providing a common interface for language model clients, centered around an abstract `complete` function that concrete implementations would need to define."
+  },
+  "repobrain/src/effort/effort_estimator.py": {
+    "summary": "This module appears to define an `EffortEstimator` class with an `estimate` function, likely responsible for estimating effort based on repository-related data. From the imports, it probably reads or writes JSON, works with filesystem paths, and may use a `networkx` graph as part of the estimation process, but the exact behavior cannot be determined from the provided context."
+  },
+  "repobrain/src/effort/__init__.py": {
+    "summary": "This module appears to be an empty package initializer for `repobrain.src.effort`. Based on the provided context, it does not currently define any classes, functions, imports, or observable behavior."
+  },
+  "repobrain/src/graph/__init__.py": {
+    "summary": "This module is the package initializer for `repobrain.src.graph`. Its responsibility is simply to re-export `GraphBuilder` from `.graph_builder`, so users can import `GraphBuilder` directly from the `graph` package namespace."
+  },
+  "repobrain/src/graph/graph_builder.py": {
+    "summary": "This module builds and loads a repository dependency graph centered on code-module imports. The `GraphBuilder` likely turns parsed code/file metadata into a `networkx` graph, resolves module names/import relationships, avoids invalid edges like self-loops, attaches graph metrics such as centrality, and writes graph output (including GraphML and possibly PNG rendering via Graphviz)."
+  },
+  "repobrain/src/parser/__init__.py": {
+    "summary": "This module is the package initializer for `repobrain.src.parser`. Its responsibility is to re-export `CodeParser` from `.parser`, so users can import it directly from the `parser` package namespace."
+  },
+  "repobrain/src/parser/parser.py": {
+    "summary": "This module defines `CodeParser`, which parses repository source files and extracts structured code information, with explicit support for Python and JavaScript and fallback handling for generic or unknown files. Based on the function names and tests, it identifies items like functions, classes, and imports, extracts and annotates comments, likely uses Tree-sitter for Python/JS parsing plus regex-based parsing as a fallback, and can write the parsed results to JSON while skipping unsupported extensions."
+  },
+  "repobrain/src/architecture/analyzer.py": {
+    "summary": "This module appears to analyze a repository graph to summarize its architecture. The `ArchitectureAnalyzer` likely classifies modules, detects architectural patterns, and builds a Mermaid diagram representation, with `analyze` serving as the main entry point and using `networkx`, `json`, and `Path` for graph handling and output."
+  },
+  "repobrain/src/architecture/__init__.py": {
+    "summary": "This module appears to be an empty package initializer for the `architecture` package. Based on the provided context, it does not define any classes, functions, imports, or behavior."
+  },
+  "repobrain/src/scanner/scanner.py": {
+    "summary": "This module defines `RepoScanner`, which scans a repository directory and summarizes basic project characteristics. Based on the tests and method names, it skips ignored directories like `.git`, detects languages/framework indicators such as Python, FastAPI, and entry points, counts lines of code, and can write the scan results to JSON."
+  },
+  "repobrain/src/scanner/__init__.py": {
+    "summary": "This module is the package initializer for `repobrain.src.scanner` and re-exports the `RepoScanner` class from `.scanner`. Its role is to provide the public scanner interface, which tests indicate is used to scan repositories for things like Python files, entry points, FastAPI usage, line counts, JSON output, and skipping `.git` directories."
+  },
+  "repobrain/src/summarizer/flow_mapper.py": {
+    "summary": "This module appears responsible for mapping flows through a graph structure, likely using NetworkX for graph representation and traversal. The `FlowMapper` class exposes `map_flows` and an internal `_bfs_flow`, suggesting it computes flow paths with a breadth-first search strategy, possibly involving filesystem paths via `Path`."
+  },
+  "repobrain/src/summarizer/__init__.py": {
+    "summary": "This module appears to be the package initializer for the `summarizer` package. Based on the provided context, it does not define any classes, functions, or imports itself, and likely exists to mark the directory as a Python package alongside `summarizer.py`, which contains the actual summarization logic."
+  },
+  "repobrain/src/summarizer/summarizer.py": {
+    "summary": "This module appears to provide repository summarization functionality centered around the `ModuleSummarizer` class and a `summarize_all` function. Based on its imports, it likely reads or writes JSON and uses an `LLMClient` together with a `RAGIndex` to generate summaries for modules or code artifacts."
+  },
+  "repobrain/src/impact/impact_analyzer.py": {
+    "summary": "This module appears to define an `ImpactAnalyzer` that analyzes code impact using a graph-based approach and LLM-assisted retrieval, based on its imports of `networkx`, `LLMClient`, and `RAGIndex`. It likely provides an `analyze` method as the main entry point and a helper `_parse_json_array` for extracting or validating JSON-array output, probably from model responses."
+  },
+  "repobrain/src/impact/__init__.py": {
+    "summary": "Unable to determine from repository analysis."
+  }
+}

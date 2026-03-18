@@ -1,0 +1,55 @@
+{
+  "pattern": "Pipeline Architecture",
+  "layers": {
+    "API": [
+      "repobrain/ui/app.py",
+      "repobrain/cli/__init__.py",
+      "repobrain/cli/main.py",
+      "repobrain/src/llm/ollama_client.py",
+      "repobrain/src/llm/openai_client.py",
+      "repobrain/src/summarizer/flow_mapper.py"
+    ],
+    "Service": [
+      "repobrain/src/effort/effort_estimator.py",
+      "repobrain/src/effort/__init__.py",
+      "repobrain/src/architecture/analyzer.py",
+      "repobrain/src/summarizer/__init__.py",
+      "repobrain/src/summarizer/summarizer.py",
+      "repobrain/src/impact/impact_analyzer.py",
+      "repobrain/src/impact/__init__.py"
+    ],
+    "Parser": [
+      "repobrain/tests/test_parser.py",
+      "repobrain/tests/test_scanner.py",
+      "repobrain/src/parser/__init__.py",
+      "repobrain/src/parser/parser.py",
+      "repobrain/src/scanner/scanner.py",
+      "repobrain/src/scanner/__init__.py"
+    ],
+    "Graph": [
+      "repobrain/tests/test_graph.py",
+      "repobrain/src/graph/__init__.py",
+      "repobrain/src/graph/graph_builder.py"
+    ],
+    "AI": [
+      "repobrain/__init__.py",
+      "repobrain/ui/__init__.py",
+      "repobrain/config/config.py",
+      "repobrain/config/__init__.py",
+      "repobrain/tests/__init__.py",
+      "repobrain/src/__init__.py",
+      "repobrain/src/llm/__init__.py",
+      "repobrain/src/llm/rag.py",
+      "repobrain/src/llm/base.py",
+      "repobrain/src/architecture/__init__.py"
+    ],
+    "Repository": [],
+    "Schema": [],
+    "Database": [],
+    "Utility": [],
+    "Config": [],
+    "Test": [],
+    "Unknown": []
+  },
+  "mermaid_diagram": "graph TD\n  subgraph API[API Layer]\n    repobrain_ui_app_py[app]\n    repobrain_cli___init___py[__init__]\n    repobrain_cli_main_py[main]\n    repobrain_src_llm_ollama_client_py[ollama_client]\n    repobrain_src_llm_openai_client_py[openai_client]\n    repobrain_src_summarizer_flow_mapper_py[flow_mapper]\n  end\n  subgraph Service[Service Layer]\n    repobrain_src_effort_effort_estimator_py[effort_estimator]\n    repobrain_src_effort___init___py[__init__]\n    repobrain_src_architecture_analyzer_py[analyzer]\n    repobrain_src_summarizer___init___py[__init__]\n    repobrain_src_summarizer_summarizer_py[summarizer]\n    repobrain_src_impact_impact_analyzer_py[impact_analyzer]\n    repobrain_src_impact___init___py[__init__]\n  end\n  subgraph Parser[Parser Layer]\n    repobrain_tests_test_parser_py[test_parser]\n    repobrain_tests_test_scanner_py[test_scanner]\n    repobrain_src_parser___init___py[__init__]\n    repobrain_src_parser_parser_py[parser]\n    repobrain_src_scanner_scanner_py[scanner]\n    repobrain_src_scanner___init___py[__init__]\n  end\n  subgraph Graph[Graph Layer]\n    repobrain_tests_test_graph_py[test_graph]\n    repobrain_src_graph___init___py[__init__]\n    repobrain_src_graph_graph_builder_py[graph_builder]\n  end\n  subgraph AI[AI Layer]\n    repobrain___init___py[__init__]\n    repobrain_ui___init___py[__init__]\n    repobrain_config_config_py[config]\n    repobrain_config___init___py[__init__]\n    repobrain_tests___init___py[__init__]\n    repobrain_src___init___py[__init__]\n    repobrain_src_llm___init___py[__init__]\n    repobrain_src_llm_rag_py[rag]\n    repobrain_src_llm_base_py[base]\n    repobrain_src_architecture___init___py[__init__]\n  end\n  API --> Service\n  Service --> Parser\n  Parser --> Graph\n  Graph --> AI"
+}

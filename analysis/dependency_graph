@@ -1,0 +1,71 @@
+digraph {
+	rankdir=LR size="20,20"
+	node [fillcolor="#e8f4f8" fontsize=10 shape=box style=filled]
+	"repobrain/src/summarizer/summarizer.py" [label="...n.src.summarizer.summarizer"]
+	"repobrain/src/scanner/scanner.py" [label="repobrain.src.scanner.scanner"]
+	"repobrain/src/parser/__init__.py" [label="repobrain.src.parser.__init__"]
+	"repobrain/src/effort/effort_estimator.py" [label="...src.effort.effort_estimator"]
+	"repobrain/src/architecture/__init__.py" [label="...n.src.architecture.__init__"]
+	"repobrain/src/llm/rag.py" [label="repobrain.src.llm.rag"]
+	"repobrain/src/impact/impact_analyzer.py" [label="....src.impact.impact_analyzer"]
+	"repobrain/cli/main.py" [label="repobrain.cli.main"]
+	"repobrain/src/llm/base.py" [label="repobrain.src.llm.base"]
+	"repobrain/src/scanner/__init__.py" [label="repobrain.src.scanner.__init__"]
+	"repobrain/__init__.py" [label="repobrain.__init__"]
+	"repobrain/config/config.py" [label="repobrain.config.config"]
+	"repobrain/src/graph/graph_builder.py" [label="...ain.src.graph.graph_builder"]
+	"repobrain/tests/test_graph.py" [label="repobrain.tests.test_graph"]
+	"repobrain/src/llm/ollama_client.py" [label="...brain.src.llm.ollama_client"]
+	"repobrain/src/summarizer/flow_mapper.py" [label="....src.summarizer.flow_mapper"]
+	"repobrain/src/__init__.py" [label="repobrain.src.__init__"]
+	"repobrain/cli/__init__.py" [label="repobrain.cli.__init__"]
+	"repobrain/tests/test_parser.py" [label="repobrain.tests.test_parser"]
+	"repobrain/src/impact/__init__.py" [label="repobrain.src.impact.__init__"]
+	"repobrain/src/parser/parser.py" [label="repobrain.src.parser.parser"]
+	"repobrain/src/architecture/analyzer.py" [label="...n.src.architecture.analyzer"]
+	"repobrain/src/summarizer/__init__.py" [label="...ain.src.summarizer.__init__"]
+	"repobrain/src/llm/__init__.py" [label="repobrain.src.llm.__init__"]
+	"repobrain/ui/app.py" [label="repobrain.ui.app"]
+	"repobrain/tests/__init__.py" [label="repobrain.tests.__init__"]
+	"repobrain/src/llm/openai_client.py" [label="...brain.src.llm.openai_client"]
+	"repobrain/config/__init__.py" [label="repobrain.config.__init__"]
+	"repobrain/src/effort/__init__.py" [label="repobrain.src.effort.__init__"]
+	"repobrain/ui/__init__.py" [label="repobrain.ui.__init__"]
+	"repobrain/tests/test_scanner.py" [label="repobrain.tests.test_scanner"]
+	"repobrain/src/graph/__init__.py" [label="repobrain.src.graph.__init__"]
+	"repobrain/src/summarizer/summarizer.py" -> "repobrain/src/llm/base.py"
+	"repobrain/src/summarizer/summarizer.py" -> "repobrain/src/llm/rag.py"
+	"repobrain/src/parser/__init__.py" -> "repobrain/src/parser/parser.py"
+	"repobrain/src/impact/impact_analyzer.py" -> "repobrain/src/llm/base.py"
+	"repobrain/src/impact/impact_analyzer.py" -> "repobrain/src/llm/rag.py"
+	"repobrain/cli/main.py" -> "repobrain/config/config.py"
+	"repobrain/cli/main.py" -> "repobrain/src/scanner/scanner.py"
+	"repobrain/cli/main.py" -> "repobrain/src/parser/parser.py"
+	"repobrain/cli/main.py" -> "repobrain/src/graph/graph_builder.py"
+	"repobrain/cli/main.py" -> "repobrain/src/architecture/analyzer.py"
+	"repobrain/cli/main.py" -> "repobrain/src/llm/rag.py"
+	"repobrain/cli/main.py" -> "repobrain/src/summarizer/summarizer.py"
+	"repobrain/cli/main.py" -> "repobrain/src/summarizer/flow_mapper.py"
+	"repobrain/cli/main.py" -> "repobrain/src/impact/impact_analyzer.py"
+	"repobrain/cli/main.py" -> "repobrain/src/effort/effort_estimator.py"
+	"repobrain/cli/main.py" -> "repobrain/src/llm/openai_client.py"
+	"repobrain/cli/main.py" -> "repobrain/src/llm/ollama_client.py"
+	"repobrain/src/scanner/__init__.py" -> "repobrain/src/scanner/scanner.py"
+	"repobrain/tests/test_graph.py" -> "repobrain/src/graph/graph_builder.py"
+	"repobrain/src/llm/ollama_client.py" -> "repobrain/src/llm/base.py"
+	"repobrain/tests/test_parser.py" -> "repobrain/src/parser/parser.py"
+	"repobrain/ui/app.py" -> "repobrain/src/llm/openai_client.py"
+	"repobrain/ui/app.py" -> "repobrain/src/llm/ollama_client.py"
+	"repobrain/ui/app.py" -> "repobrain/src/llm/rag.py"
+	"repobrain/ui/app.py" -> "repobrain/src/scanner/scanner.py"
+	"repobrain/ui/app.py" -> "repobrain/src/parser/parser.py"
+	"repobrain/ui/app.py" -> "repobrain/src/graph/graph_builder.py"
+	"repobrain/ui/app.py" -> "repobrain/src/architecture/analyzer.py"
+	"repobrain/ui/app.py" -> "repobrain/src/summarizer/summarizer.py"
+	"repobrain/ui/app.py" -> "repobrain/src/impact/impact_analyzer.py"
+	"repobrain/ui/app.py" -> "repobrain/src/effort/effort_estimator.py"
+	"repobrain/src/llm/openai_client.py" -> "repobrain/src/llm/base.py"
+	"repobrain/config/__init__.py" -> "repobrain/config/config.py"
+	"repobrain/tests/test_scanner.py" -> "repobrain/src/scanner/scanner.py"
+	"repobrain/src/graph/__init__.py" -> "repobrain/src/graph/graph_builder.py"
+}

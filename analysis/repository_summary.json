@@ -1,0 +1,48 @@
+{
+  "languages": [
+    "Python"
+  ],
+  "frameworks": [],
+  "entry_points": [
+    "repobrain/ui/app.py",
+    "repobrain/cli/main.py"
+  ],
+  "file_count": 32,
+  "loc_by_language": {
+    "Python": 2314
+  },
+  "files": [
+    "repobrain/__init__.py",
+    "repobrain/ui/__init__.py",
+    "repobrain/ui/app.py",
+    "repobrain/config/config.py",
+    "repobrain/config/__init__.py",
+    "repobrain/tests/test_parser.py",
+    "repobrain/tests/test_scanner.py",
+    "repobrain/tests/__init__.py",
+    "repobrain/tests/test_graph.py",
+    "repobrain/cli/__init__.py",
+    "repobrain/cli/main.py",
+    "repobrain/src/__init__.py",
+    "repobrain/src/llm/ollama_client.py",
+    "repobrain/src/llm/__init__.py",
+    "repobrain/src/llm/rag.py",
+    "repobrain/src/llm/openai_client.py",
+    "repobrain/src/llm/base.py",
+    "repobrain/src/effort/effort_estimator.py",
+    "repobrain/src/effort/__init__.py",
+    "repobrain/src/graph/__init__.py",
+    "repobrain/src/graph/graph_builder.py",
+    "repobrain/src/parser/__init__.py",
+    "repobrain/src/parser/parser.py",
+    "repobrain/src/architecture/analyzer.py",
+    "repobrain/src/architecture/__init__.py",
+    "repobrain/src/scanner/scanner.py",
+    "repobrain/src/scanner/__init__.py",
+    "repobrain/src/summarizer/flow_mapper.py",
+    "repobrain/src/summarizer/__init__.py",
+    "repobrain/src/summarizer/summarizer.py",
+    "repobrain/src/impact/impact_analyzer.py",
+    "repobrain/src/impact/__init__.py"
+  ]
+}

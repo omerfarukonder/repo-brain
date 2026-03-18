@@ -25,7 +25,7 @@ class RAGIndex:
             self._collection = client.get_or_create_collection("repobrain")
         return self._collection
 
-    def build(self, parsed_code: dict) -> None:
+    def build(self, parsed_code: dict, repo_path: str = ".") -> None:
         """Embed all parsed files and store in ChromaDB.
 
         Deletes and recreates the collection on each call for a fresh index.
@@ -50,11 +50,31 @@ class RAGIndex:
         documents: list[str] = []
         ids: list[str] = []
 
+        root = Path(repo_path).resolve()
+
         for rel_path, meta in files_data.items():
             functions = ", ".join(meta.get("functions", []))
             classes = ", ".join(meta.get("classes", []))
             imports = "; ".join(meta.get("imports", [])[:10])
+
+            # Read actual source code for richer embeddings
+            source = ""
+            try:
+                file_path = root / rel_path
+                if file_path.exists():
+                    raw = file_path.read_text(encoding="utf-8", errors="ignore")
+                    # Truncate to keep embedding meaningful (first 2000 chars)
+                    source = raw[:2000]
+            except Exception:
+                pass
+
             text = (
+                f"File: {rel_path}\n"
+                f"Language: {meta.get('language', 'unknown')}\n"
+                f"Classes: {classes or 'none'}\n"
+                f"Functions: {functions or 'none'}\n"
+                f"Imports: {imports or 'none'}\n"
+                f"Source:\n{source}" if source else
                 f"File: {rel_path}\n"
                 f"Language: {meta.get('language', 'unknown')}\n"
                 f"Classes: {classes or 'none'}\n"
