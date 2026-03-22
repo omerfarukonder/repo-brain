@@ -225,13 +225,17 @@ def impact(change_description: str):
     llm = _build_llm_client()
     fm = _build_feedback_manager(cfg)
 
+    # Ensure global brain is seeded on first run (idempotent)
+    n_global = fm.ensure_global_brain()
+
     click.echo(f"\nAnalyzing impact of: \"{change_description}\"")
+    click.echo(f"  Global brain: {n_global} heuristics | Repo brain: {len(fm.get_history())} feedback entries")
     _sep()
 
     cal = fm.get_calibration_factor()
     if cal != 1.0:
         direction = "lower" if cal < 1.0 else "higher"
-        click.echo(f"  (Feedback calibration active: {cal:.2f}x — estimates will be {direction} based on your past feedback)")
+        click.echo(f"  (Repo calibration: {cal:.2f}x — trending {direction} from your past feedback)")
 
     analyzer = ImpactAnalyzer()
     impact_report = analyzer.analyze(

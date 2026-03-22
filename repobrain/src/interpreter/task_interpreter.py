@@ -35,6 +35,8 @@ class TaskInterpreter:
         parsed_code: dict,
         rag,
         llm,
+        seed_modules: list[str] | None = None,
+        seed_sources: dict[str, str] | None = None,
     ) -> dict:
         """Run the full interpretation pipeline.
 
@@ -70,10 +72,25 @@ class TaskInterpreter:
         )
 
         # ── Call 2: Atomic decomposition (step 3) ─────────────────────────
+        # Use seed_modules (files that actually need editing) rather than the
+        # full affected_modules list (which includes transitive graph neighbours
+        # that don't need to be touched). Pass actual source code so the LLM
+        # estimates only the DELTA — not work already implemented.
+        decomp_modules = seed_modules if seed_modules else affected_modules
+
+        # Build source context: prefer actual file content over RAG chunks
+        if seed_sources:
+            source_context = "\n---\n".join(
+                f"# {path}\n{src}" for path, src in seed_sources.items()
+            )
+        else:
+            source_context = context  # fall back to RAG chunks
+
         atomic_tasks = self._call_atomic_decomposition(
             interp.get("clarified_intent", change_description),
-            affected_modules,
+            decomp_modules,
             interp.get("scope", []),
+            source_context,
             llm,
         )
 
@@ -134,6 +151,7 @@ class TaskInterpreter:
         clarified_intent: str,
         affected_modules: list[str],
         scope: list[str],
+        existing_code_context: str,
         llm,
     ) -> list[dict]:
         affected_summary = "\n".join(f"- {m}" for m in affected_modules[:15])
@@ -144,19 +162,24 @@ class TaskInterpreter:
             f"Task: \"{clarified_intent}\"\n"
             f"Systems involved: {scope_str}\n"
             f"Files to modify:\n{affected_summary}\n\n"
-            f"Break this into 3–6 atomic tasks a developer would execute sequentially.\n"
-            f"For each task, estimate realistic time in hours.\n\n"
+            f"EXISTING CODE (what is already implemented):\n{existing_code_context}\n\n"
+            f"Break this into atomic tasks a developer would execute. "
+            f"Estimate ONLY the delta — work that does not already exist in the code above.\n\n"
             f"Return ONLY a valid JSON array:\n"
             f"[\n"
             f"  {{\"task\": \"<specific action>\", \"layer\": \"<frontend|backend|api|database|test|config>\","
             f" \"min_hours\": <number>, \"max_hours\": <number>}}\n"
             f"]\n\n"
             f"Rules:\n"
-            f"- Always include a testing task\n"
-            f"- min_hours and max_hours must be positive numbers\n"
-            f"- max_hours >= min_hours\n"
-            f"- Be realistic: simple UI change = 0.5-1h, complex backend = 3-8h\n"
-            f"- Maximum 6 tasks"
+            f"- CRITICAL: If the existing code already loads, computes, or stores the data needed, "
+            f"do NOT add a task for that — it is already done\n"
+            f"- CRITICAL: Estimate only what needs to be written, not what already exists\n"
+            f"- A UI addition to an existing file = 0.25–1h, not hours of setup\n"
+            f"- A new isolated function in an existing file = 0.5–1.5h\n"
+            f"- Only add a testing task if manual or automated testing is actually required\n"
+            f"- min_hours and max_hours must be positive numbers, max >= min\n"
+            f"- Maximum 5 tasks — if you have more, the decomposition is too granular\n"
+            f"- Be conservative: default to the lower end for well-understood changes"
         )
         raw = llm.complete(prompt)
         tasks = _parse_json_array(raw)

@@ -95,7 +95,10 @@ class ImpactAnalyzer:
         # Generate concrete edit steps with code snippets — one LLM call per seed file
         # We call per-file so the LLM can focus on the actual source and produce
         # accurate before/after code snippets.
+        # seed_source_map is also forwarded to TaskInterpreter so it can estimate
+        # only the delta (what is NOT already implemented).
         edit_steps = []
+        seed_source_map: dict[str, str] = {}
         if seed_modules:
             root = Path(repo_path).resolve()
             for seed_file in seed_modules:
@@ -115,6 +118,9 @@ class ImpactAnalyzer:
                 # Truncate very large files to keep prompt manageable
                 if len(source) > 6000:
                     source = source[:6000] + "\n... (truncated)"
+
+                # Store for TaskInterpreter (full source, already truncated)
+                seed_source_map[seed_file] = source
 
                 step_prompt = (
                     f"You are a code editing assistant. Given the change request and the full source code, "
@@ -154,6 +160,12 @@ class ImpactAnalyzer:
         # ── Task interpretation (dev-thinking §2) ────────────────────────
         # Run the 6-step pipeline to extract clarified intent, unknowns,
         # risks, atomic tasks, and scope for richer effort estimation.
+        #
+        # IMPORTANT: pass seed_modules (not affected_list) for atomic
+        # decomposition — the LLM should only be told about the files that
+        # actually need editing, not all transitive graph neighbours.
+        # Also pass the already-read source code so the LLM can estimate
+        # only the delta rather than re-building from scratch.
         interpretation: dict = {}
         if architecture_report is not None:
             try:
@@ -165,6 +177,8 @@ class ImpactAnalyzer:
                     parsed_code,
                     rag,
                     llm,
+                    seed_modules=seed_modules,
+                    seed_sources=seed_source_map,
                 )
             except Exception:
                 interpretation = {}

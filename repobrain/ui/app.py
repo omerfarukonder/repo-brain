@@ -66,6 +66,28 @@ with st.sidebar:
     chroma_dir = st.text_input("Chroma persist dir", value="./.chroma")
     embedding_model = "all-MiniLM-L6-v2"
 
+    # ── Brain status ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("**Knowledge Bases**")
+    try:
+        from repobrain.src.feedback.global_brain import GlobalBrain
+        gb = GlobalBrain(embedding_model)
+        n_global = gb.ensure_initialized()
+        st.success(f"Global brain: {n_global} heuristics (static)")
+    except Exception:
+        st.warning("Global brain not initialized")
+
+    try:
+        import json as _j
+        _hf = Path(repo_path) / "analysis" / "feedback_history.json"
+        n_repo = len(_j.load(_hf.open())) if _hf.exists() else 0
+        if n_repo > 0:
+            st.info(f"Repo brain: {n_repo} feedback entries")
+        else:
+            st.caption("Repo brain: no feedback yet")
+    except Exception:
+        st.caption("Repo brain: no feedback yet")
+
     st.markdown("---")
     if st.button("Run Analysis", type="primary", use_container_width=True):
         with st.spinner("Running full analysis..."):

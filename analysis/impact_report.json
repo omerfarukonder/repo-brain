@@ -1,56 +1,43 @@
 {
-  "change_description": "add a new heading to the streamlit UI",
-  "seed_modules": [
-    "repobrain/ui/app.py",
-    "repobrain/config/config.py"
-  ],
-  "affected_modules": [
-    "repobrain/cli/main.py",
-    "repobrain/config/__init__.py",
-    "repobrain/config/config.py",
-    "repobrain/src/architecture/analyzer.py",
-    "repobrain/src/effort/effort_estimator.py",
-    "repobrain/src/graph/graph_builder.py",
-    "repobrain/src/impact/impact_analyzer.py",
-    "repobrain/src/llm/ollama_client.py",
-    "repobrain/src/llm/openai_client.py",
-    "repobrain/src/llm/rag.py",
-    "repobrain/src/parser/parser.py",
-    "repobrain/src/scanner/scanner.py",
-    "repobrain/src/summarizer/summarizer.py",
-    "repobrain/ui/app.py"
-  ],
-  "total_affected": 14,
+  "change_description": "add a line chart to the impact tab showing calibration factor over time based on feedback history\n",
+  "seed_modules": [],
+  "affected_modules": [],
+  "total_affected": 0,
   "edit_steps": [],
   "interpretation": {
-    "clarified_intent": "Add a new heading to the streamlit UI",
+    "clarified_intent": "Add a line chart to the Impact tab showing calibration factor over time based on feedback history",
     "scope": [
-      "frontend"
+      "backend",
+      "api"
     ],
-    "unknown_level": "Low",
-    "unknowns": [],
-    "risks": [],
+    "unknown_level": "Medium",
+    "unknowns": [
+      "Specific details about the calibration factor calculation and how it relates to the feedback history are unclear"
+    ],
+    "risks": [
+      "Breaking change: introducing a new chart may affect dashboard layout and user experience"
+    ],
     "atomic_tasks": [
       {
-        "task": "Create a new file for streamlit UI layout",
-        "layer": "frontend",
-        "min_hours": 0.25,
-        "max_hours": 0.5
-      },
-      {
-        "task": "Add the new heading to the existing Streamlit app",
-        "layer": "frontend",
-        "min_hours": 1.0,
-        "max_hours": 2.0
-      },
-      {
-        "task": "Test the new heading in various scenarios (e.g., different screen sizes, devices)",
-        "layer": "test",
+        "task": "Create a new function in app.py to generate calibration factor data from feedback history",
+        "layer": "backend",
         "min_hours": 0.5,
         "max_hours": 1.0
       },
       {
-        "task": "Update the app.py file to include the new UI component",
+        "task": "Modify on_progress function in app.py to include the new calibration factor data",
+        "layer": "backend",
+        "min_hours": 0.25,
+        "max_hours": 0.5
+      },
+      {
+        "task": "Update get_plotly_template function in app.py to use the new calibration factor data for the line chart",
+        "layer": "backend",
+        "min_hours": 0.5,
+        "max_hours": 1.0
+      },
+      {
+        "task": "Add a UI component in the Impact tab of the dashboard to display the line chart with calibration factor data",
         "layer": "frontend",
         "min_hours": 0.25,
         "max_hours": 0.5

@@ -154,17 +154,21 @@ class EffortEstimator:
 
         dev_thinking_total = surface_area + integ_depth + unknowns_score + risk_score + cognitive_load
 
+        # ── Feedback calibration (scope-aware) ───────────────────────────
+        # Computed before ETA so the calibration factor can also be applied
+        # to the atomic-task-based time estimate (not just graph_total).
+        calibration_factor = 1.0
+        if feedback_manager is not None:
+            scope = interpretation.get("scope", [])
+            calibration_factor = feedback_manager.get_calibration_factor(scope=scope)
+            graph_total = graph_total * calibration_factor
+
         # ── ETA formula (§4 of dev-thinking.md) ─────────────────────────
         atomic_tasks = interpretation.get("atomic_tasks", [])
         eta_range, uncertainty_mult, context_mult = _compute_eta(
-            atomic_tasks, unknown_level, arch_pattern, layers_touched
+            atomic_tasks, unknown_level, arch_pattern, layers_touched,
+            calibration_factor=calibration_factor,
         )
-
-        # ── Feedback calibration ─────────────────────────────────────────
-        calibration_factor = 1.0
-        if feedback_manager is not None:
-            calibration_factor = feedback_manager.get_calibration_factor()
-            graph_total = graph_total * calibration_factor
 
         # ── Map to complexity tier ───────────────────────────────────────
         # Use dev-thinking score when available, fall back to graph score.
@@ -496,10 +500,13 @@ def _compute_eta(
     unknown_level: str,
     arch_pattern: str,
     layers_touched: list[str],
+    calibration_factor: float = 1.0,
 ) -> tuple[str, float, float]:
     """Compute ETA range string using §4 formula.
 
     Returns (eta_range_str, uncertainty_mult, context_mult).
+    calibration_factor is applied to the final hours so that
+    user feedback ("estimates are too high") also shrinks the ETA.
     """
     if not atomic_tasks:
         return ("", 1.0, 1.0)
@@ -509,18 +516,27 @@ def _compute_eta(
 
     uncertainty_mult = {"Low": 1.2, "Medium": 1.5, "High": 2.0}.get(unknown_level, 1.5)
 
-    context_mult = {
-        "Monolith": 1.0,
-        "Pipeline Architecture": 1.2,
-        "Layered Architecture": 1.3,
-        "Microservices": 1.5,
-    }.get(arch_pattern, 1.2)
+    # Context multiplier only applies when the change actually crosses
+    # architectural boundaries. A single-layer change (e.g. pure frontend)
+    # should not be penalised by the repo's overall architecture pattern.
+    if len(layers_touched) <= 1:
+        context_mult = 1.0   # isolated — architecture irrelevant
+    else:
+        context_mult = {
+            "Monolith": 1.0,
+            "Pipeline Architecture": 1.1,
+            "Layered Architecture": 1.2,
+            "Microservices": 1.4,
+        }.get(arch_pattern, 1.1)
+        # Extra bump only when truly cross-cutting (3+ layers)
+        if len(layers_touched) >= 3:
+            context_mult *= 1.15
 
-    if len(layers_touched) >= 3:
-        context_mult *= 1.2
-
-    final_min = raw_min * uncertainty_mult * context_mult
-    final_max = raw_max * uncertainty_mult * context_mult
+    # Apply calibration: if user feedback says estimates run high/low,
+    # scale the ETA proportionally (clamped same as graph calibration).
+    cal = max(0.5, min(1.5, calibration_factor))
+    final_min = raw_min * uncertainty_mult * context_mult * cal
+    final_max = raw_max * uncertainty_mult * context_mult * cal
 
     # Convert to days if > 8h
     def _fmt(hours: float) -> str:

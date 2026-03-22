@@ -12,7 +12,8 @@
       "Bash(dot -V)",
       "Bash(brew install:*)",
       "Bash(find /Users/omerfarukonder/Desktop/Projects/repo-brain -type d -not -path */.* -not -path */__pycache__* -not -path *.egg-info*)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)",
+      "Bash(pkill -f \"streamlit run\")"
     ],
     "additionalDirectories": [
       "/Users/omerfarukonder/Desktop/Projects/repo-brain/repobrain/analysis"

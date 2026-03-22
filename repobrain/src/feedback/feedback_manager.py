@@ -1,27 +1,30 @@
 """
-Feedback Manager — evolving knowledge base for effort estimation calibration.
+Feedback Manager — repo-specific learning layer.
 
-How it works
-------------
-1. User runs `repobrain impact "add OAuth login"` → system estimates "Medium, 3-5 days"
-2. User runs `repobrain feedback "this should take less time"` (natural language)
-3. LLM parses the feedback into a structured correction:
-     direction: lower | higher | correct
-     magnitude: 0.0–1.0 (how strong the correction is)
-4. The entry is stored in two places:
-   a. `analysis/feedback_history.json` — append-only log used for calibration
-   b. ChromaDB collection `repobrain_feedback` — for semantic retrieval
+Architecture (Option A — Static Global Brain):
 
-Calibration
------------
-`get_calibration_factor()` computes a weighted-average bias from recent feedback
-and returns a multiplier (0.5–1.5) applied to the raw effort score.
+    GlobalBrain  (~/.repobrain/global/)
+        Static seed knowledge from dev-thinking.md.
+        Never mutated by user feedback.
+        Provides: context injection only.
 
-Context injection
------------------
-`get_relevant_context(change_desc)` queries ChromaDB for past feedback on
-similar changes and returns text chunks that are injected into future LLM prompts.
-This makes the system genuinely learn from past corrections.
+    FeedbackManager  (<repo>/analysis/feedback_history.json)
+        Repo-specific feedback from real usage.
+        Provides: context injection + calibration factor.
+
+When estimating:
+    context  = global_brain.get_relevant_context()   (general heuristics)
+             + feedback_manager.get_relevant_context() (repo-specific, ranked higher)
+
+    calibration_factor = feedback_manager.get_calibration_factor(scope)
+        - Scope-aware: feedback on "frontend" changes only adjusts frontend estimates
+        - Time-decayed: older entries carry less weight
+        - Only from repo brain — global brain never contributes to calibration
+
+When feedback arrives:
+    → Always written to repo brain (FeedbackManager)
+    → Scope field stored from the interpretation result
+    → Global brain is never touched
 """
 
 from __future__ import annotations
@@ -29,12 +32,16 @@ from __future__ import annotations
 import json
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+from repobrain.src.feedback.global_brain import GlobalBrain
+
+_REPO_SIMILARITY_THRESHOLD = 1.3   # L2 distance cutoff for repo feedback retrieval
 
 
 class FeedbackManager:
-    """Stores, retrieves, and applies user feedback to calibrate future estimates."""
+    """Repo-specific feedback store with scope-aware, time-decayed calibration."""
 
     def __init__(
         self,
@@ -42,119 +49,141 @@ class FeedbackManager:
         persist_dir: str = "./.chroma",
         embedding_model: str = "all-MiniLM-L6-v2",
     ) -> None:
-        self._repo_path = Path(repo_path).resolve()
+        self._repo_path    = Path(repo_path).resolve()
         self._history_file = self._repo_path / "analysis" / "feedback_history.json"
-        self._persist_dir = persist_dir
+        self._persist_dir  = persist_dir
         self._embedding_model = embedding_model
-        self._embedder = None
-        self._collection = None
+        self._embedder     = None
+        self._collection   = None
+        self._global_brain = GlobalBrain(embedding_model)
 
     # ── Public API ────────────────────────────────────────────────────────────
 
     def add(self, raw_feedback: str, llm) -> dict:
-        """Parse natural language feedback and persist it.
+        """Parse natural language feedback and persist it to the repo brain.
 
         Reads the last saved impact_report.json + effort_estimation.json to
-        understand what the user is correcting, then parses the feedback via
-        LLM and stores the structured result.
-
-        Returns the stored entry dict, or a dict with key "error" if no prior
-        estimate was found.
+        understand what the user is correcting. Stores the scope from the
+        impact report's interpretation so calibration can be scope-filtered.
         """
         impact = self._load_last_impact()
         effort = self._load_last_effort()
 
         if not impact or not effort:
-            return {
-                "error": "No previous estimate found. Run `repobrain impact` first."
-            }
+            return {"error": "No previous estimate found. Run `repobrain impact` first."}
 
         change_desc = impact.get("change_description", "unknown")
-        complexity = effort.get("complexity", "unknown")
+        complexity  = effort.get("complexity", "unknown")
         effort_range = effort.get("effort_range", "unknown")
-        score = effort.get("scores", {}).get("total", 0.0)
+        score       = effort.get("scores", {}).get("graph_total", 0.0)
+        scope       = impact.get("interpretation", {}).get("scope", [])
 
         parsed = self._parse_feedback(raw_feedback, complexity, effort_range, llm)
 
         entry = {
-            "id": str(uuid.uuid4()),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "change_description": change_desc,
+            "id":                  str(uuid.uuid4()),
+            "timestamp":           datetime.now(timezone.utc).isoformat(),
+            "change_description":  change_desc,
+            "scope":               scope,
             "estimated_complexity": complexity,
-            "estimated_effort": effort_range,
-            "estimated_score": score,
-            "raw_feedback": raw_feedback,
-            "parsed_direction": parsed.get("direction", "correct"),
-            "parsed_magnitude": float(parsed.get("magnitude", 0.0)),
+            "estimated_effort":    effort_range,
+            "estimated_score":     score,
+            "raw_feedback":        raw_feedback,
+            "parsed_direction":    parsed.get("direction", "correct"),
+            "parsed_magnitude":    float(parsed.get("magnitude", 0.0)),
         }
 
         history = self._load_history()
         history.append(entry)
         self._save_history(history)
-
         self._embed_and_store(entry)
 
         return entry
 
-    def get_calibration_factor(self) -> float:
-        """Return a score multiplier derived from accumulated feedback.
+    def get_calibration_factor(self, scope: list[str] | None = None) -> float:
+        """Compute a score multiplier from repo-specific feedback.
 
-        Uses the last 20 feedback entries with recency weighting (more recent
-        entries count more). The bias is clamped to a ±50% adjustment:
-          - All "lower" feedback → factor approaches 0.5 (estimates cut in half)
-          - All "higher" feedback → factor approaches 1.5 (estimates boosted)
-          - No feedback → factor = 1.0 (no change)
+        Scope-aware: if scope is provided, prefer entries that share at least
+        one scope tag. Falls back to all entries if fewer than 3 scoped ones exist.
+
+        Time-decayed: entries older than 90 days carry much less weight.
+        Recent entries (< 7 days) carry full weight.
+
+        Range: [0.5, 1.5]  — never more than ±50% adjustment.
         """
         history = self._load_history()
         if not history:
             return 1.0
 
-        recent = history[-20:]
+        if scope:
+            scoped = [e for e in history if _shares_scope(e.get("scope", []), scope)]
+            entries = scoped if len(scoped) >= 3 else history
+        else:
+            entries = history
+
+        recent = entries[-20:]
         direction_map = {"lower": -1.0, "correct": 0.0, "higher": 1.0}
 
-        weighted_sum = 0.0
-        total_weight = 0.0
+        weighted_sum  = 0.0
+        total_weight  = 0.0
         for i, entry in enumerate(recent):
-            weight = float(i + 1)  # later entries weigh more
-            direction = direction_map.get(entry.get("parsed_direction", "correct"), 0.0)
-            magnitude = float(entry.get("parsed_magnitude", 0.0))
-            weighted_sum += direction * magnitude * weight
-            total_weight += weight
+            recency_weight = float(i + 1)
+            time_weight    = _time_decay(entry.get("timestamp", ""))
+            weight         = recency_weight * time_weight
 
-        bias = weighted_sum / total_weight if total_weight > 0 else 0.0
-        factor = 1.0 + bias * 0.5  # ±50% max adjustment
+            direction  = direction_map.get(entry.get("parsed_direction", "correct"), 0.0)
+            magnitude  = float(entry.get("parsed_magnitude", 0.0))
+            weighted_sum  += direction * magnitude * weight
+            total_weight  += weight
+
+        if total_weight == 0:
+            return 1.0
+
+        bias   = weighted_sum / total_weight
+        factor = 1.0 + bias * 0.5
         return round(max(0.5, min(1.5, factor)), 3)
 
     def get_relevant_context(self, change_desc: str, top_k: int = 3) -> list[str]:
-        """Return past feedback relevant to the current change description.
+        """Return merged context: repo-specific first, then global heuristics.
 
-        Uses semantic search over the ChromaDB feedback collection.
-        Returns an empty list if no feedback has been stored yet.
+        Repo-specific entries are ranked higher because they reflect this
+        codebase's actual patterns. Global entries fill the gap when the
+        repo brain is sparse or when the change type is new.
+
+        Applies similarity threshold to filter irrelevant entries from both.
         """
-        try:
-            col = self._get_collection()
-            if col.count() == 0:
-                return []
-            embedder = self._get_embedder()
-            q_emb = embedder.encode([change_desc], show_progress_bar=False).tolist()
-            results = col.query(
-                query_embeddings=q_emb,
-                n_results=min(top_k, col.count()),
-            )
-            return results.get("documents", [[]])[0]
-        except Exception:
-            return []
+        # Repo-specific (higher priority — listed first)
+        repo_ctx   = self._get_repo_context(change_desc, top_k=top_k)
+        # Global heuristics (fills knowledge gaps)
+        global_ctx = self._global_brain.get_relevant_context(change_desc, top_k=2)
+
+        # Deduplicate by content prefix, repo entries win
+        seen: set[str] = set()
+        merged: list[str] = []
+        for doc in repo_ctx + global_ctx:
+            key = doc[:80]
+            if key not in seen:
+                seen.add(key)
+                merged.append(doc)
+
+        return merged
 
     def get_history(self) -> list[dict]:
-        """Return the full feedback history log."""
         return self._load_history()
+
+    def global_brain_count(self) -> int:
+        """Return number of entries in the global brain."""
+        return self._global_brain.count()
+
+    def ensure_global_brain(self) -> int:
+        """Ensure global brain is initialized. Returns entry count."""
+        return self._global_brain.ensure_initialized()
 
     # ── LLM feedback parsing ──────────────────────────────────────────────────
 
     def _parse_feedback(
         self, raw_feedback: str, complexity: str, effort_range: str, llm
     ) -> dict:
-        """Ask the LLM to extract direction + magnitude from natural language feedback."""
         prompt = (
             f"Analyze this user feedback about a software effort estimate.\n\n"
             f"Previous estimate: {complexity} complexity, {effort_range}\n"
@@ -181,6 +210,30 @@ class FeedbackManager:
         except Exception:
             pass
         return {"direction": "correct", "magnitude": 0.0}
+
+    # ── Repo context retrieval ────────────────────────────────────────────────
+
+    def _get_repo_context(self, change_desc: str, top_k: int = 3) -> list[str]:
+        try:
+            col = self._get_collection()
+            if col.count() == 0:
+                return []
+
+            embedder = self._get_embedder()
+            q_emb    = embedder.encode([change_desc], show_progress_bar=False).tolist()
+            results  = col.query(
+                query_embeddings=q_emb,
+                n_results=min(top_k, col.count()),
+                include=["documents", "distances"],
+            )
+            docs      = results.get("documents", [[]])[0]
+            distances = results.get("distances",  [[]])[0]
+            return [
+                doc for doc, dist in zip(docs, distances)
+                if dist <= _REPO_SIMILARITY_THRESHOLD
+            ]
+        except Exception:
+            return []
 
     # ── Storage helpers ───────────────────────────────────────────────────────
 
@@ -230,20 +283,20 @@ class FeedbackManager:
         if self._collection is None:
             import chromadb
             client = chromadb.PersistentClient(path=self._persist_dir)
-            # Separate collection from code index — never wiped by rag.build()
             self._collection = client.get_or_create_collection("repobrain_feedback")
         return self._collection
 
     def _embed_and_store(self, entry: dict) -> None:
-        """Embed the feedback entry and store it in ChromaDB for future retrieval."""
         try:
-            doc_text = (
+            scope_str = ", ".join(entry.get("scope", []))
+            doc_text  = (
                 f"Change: {entry['change_description']}\n"
+                f"Scope: {scope_str}\n"
                 f"Estimate: {entry['estimated_complexity']} ({entry['estimated_effort']})\n"
                 f"Feedback: {entry['raw_feedback']}\n"
                 f"Correction: {entry['parsed_direction']} by {entry['parsed_magnitude']:.1f}"
             )
-            embedder = self._get_embedder()
+            embedder  = self._get_embedder()
             embedding = embedder.encode([doc_text], show_progress_bar=False).tolist()
             self._get_collection().add(
                 documents=[doc_text],
@@ -251,5 +304,37 @@ class FeedbackManager:
                 ids=[entry["id"]],
             )
         except Exception:
-            # Embedding failure should never block feedback storage
             pass
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+
+def _shares_scope(entry_scope: list[str], query_scope: list[str]) -> bool:
+    """Return True if the two scope lists share at least one tag."""
+    return bool(set(entry_scope) & set(query_scope))
+
+
+def _time_decay(timestamp_str: str) -> float:
+    """Return a weight in (0, 1] based on how old the entry is.
+
+    ≤ 7 days  → 1.0  (full weight)
+    ≤ 30 days → 0.7
+    ≤ 90 days → 0.4
+    > 90 days → 0.1  (almost ignored but not zero)
+    """
+    try:
+        ts = datetime.fromisoformat(timestamp_str)
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        age = (datetime.now(timezone.utc) - ts).days
+        if age <= 7:
+            return 1.0
+        elif age <= 30:
+            return 0.7
+        elif age <= 90:
+            return 0.4
+        else:
+            return 0.1
+    except Exception:
+        return 0.5

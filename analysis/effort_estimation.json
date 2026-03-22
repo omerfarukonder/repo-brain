@@ -2,66 +2,65 @@
   "complexity": "Low",
   "effort_range": "4-9 hours",
   "testing_effort": "4 hours",
-  "confidence": "85%",
-  "layers_touched": [
-    "AI",
-    "API",
-    "Graph",
-    "Parser",
-    "Service"
-  ],
-  "clarified_intent": "Add a new heading to the streamlit UI",
+  "confidence": "45%",
+  "layers_touched": [],
+  "clarified_intent": "Add a line chart to the Impact tab showing calibration factor over time based on feedback history",
   "scope": [
-    "frontend"
+    "backend",
+    "api"
   ],
-  "unknown_level": "Low",
-  "unknowns": [],
-  "risks": [],
+  "unknown_level": "Medium",
+  "unknowns": [
+    "Specific details about the calibration factor calculation and how it relates to the feedback history are unclear"
+  ],
+  "risks": [
+    "Breaking change: introducing a new chart may affect dashboard layout and user experience"
+  ],
   "insufficient_info": false,
   "task_breakdown": [
     {
-      "task": "Create a new file for streamlit UI layout",
-      "layer": "frontend",
-      "min_hours": 0.25,
-      "max_hours": 0.5
-    },
-    {
-      "task": "Add the new heading to the existing Streamlit app",
-      "layer": "frontend",
-      "min_hours": 1.0,
-      "max_hours": 2.0
-    },
-    {
-      "task": "Test the new heading in various scenarios (e.g., different screen sizes, devices)",
-      "layer": "test",
+      "task": "Create a new function in app.py to generate calibration factor data from feedback history",
+      "layer": "backend",
       "min_hours": 0.5,
       "max_hours": 1.0
     },
     {
-      "task": "Update the app.py file to include the new UI component",
+      "task": "Modify on_progress function in app.py to include the new calibration factor data",
+      "layer": "backend",
+      "min_hours": 0.25,
+      "max_hours": 0.5
+    },
+    {
+      "task": "Update get_plotly_template function in app.py to use the new calibration factor data for the line chart",
+      "layer": "backend",
+      "min_hours": 0.5,
+      "max_hours": 1.0
+    },
+    {
+      "task": "Add a UI component in the Impact tab of the dashboard to display the line chart with calibration factor data",
       "layer": "frontend",
       "min_hours": 0.25,
       "max_hours": 0.5
     }
   ],
-  "eta_range": "3.5h\u20136.9h",
-  "uncertainty_mult": 1.2,
-  "context_mult": 1.44,
-  "reasoning": "Surface area 5/5 (5 layers: AI, API, Graph, Parser, Service). integration depth 2/5. unknowns 1/5 (Low). risk 2/5. cognitive load 2/5. graph score 134.2/50. dev-thinking score 12/25.",
-  "dev_thinking_score": 12,
+  "eta_range": "1.6h\u20133.1h",
+  "uncertainty_mult": 1.5,
+  "context_mult": 1.0,
+  "reasoning": "Surface area 1/5. integration depth 1/5. unknowns 3/5 (Medium). risk 2/5. cognitive load 1/5. graph score 0.0/50. dev-thinking score 8/25.",
+  "dev_thinking_score": 8,
   "scores": {
-    "coupling_density": 2.64,
-    "propagation_risk": 2.5,
-    "chromatic_estimate": 3.0,
-    "domination_number": 3.0,
-    "amplification_ratio": 10.0,
-    "graph_total": 134.2,
+    "coupling_density": 0.0,
+    "propagation_risk": 0.0,
+    "chromatic_estimate": 0.0,
+    "domination_number": 0.0,
+    "amplification_ratio": 0.0,
+    "graph_total": 0.0,
     "calibration_factor": 0.7,
-    "surface_area": 5,
-    "integration_depth": 2,
-    "unknowns_score": 1,
+    "surface_area": 1,
+    "integration_depth": 1,
+    "unknowns_score": 3,
     "risk_score": 2,
-    "cognitive_load": 2,
-    "dev_thinking_total": 12
+    "cognitive_load": 1,
+    "dev_thinking_total": 8
   }
 }

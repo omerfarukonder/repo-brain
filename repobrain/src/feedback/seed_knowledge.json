@@ -1,0 +1,182 @@
+[
+  {
+    "id": "seed_ui_styling",
+    "change_description": "UI styling or layout change, color, font, spacing, CSS",
+    "scope": ["frontend"],
+    "raw_feedback": "UI-only styling changes are always faster than graph score suggests. The dependency graph connects UI to backend but those connections are not actually touched for visual changes.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.6,
+    "principle": "Surface area principle: import graph overstates coupling for pure visual changes"
+  },
+  {
+    "id": "seed_ui_component",
+    "change_description": "Adding a new UI component or widget",
+    "scope": ["frontend"],
+    "raw_feedback": "Adding a contained UI component is well-understood work. It rarely requires backend changes and the effort is predictable.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.3,
+    "principle": "Familiarity principle: UI component patterns are repetitive and well-understood"
+  },
+  {
+    "id": "seed_ui_backend_data",
+    "change_description": "UI change that requires new data from the backend or API",
+    "scope": ["frontend", "api"],
+    "raw_feedback": "When UI changes need new backend data, the effort is regularly underestimated because it requires coordination across the stack.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.4,
+    "principle": "Integration depth principle: cross-layer changes multiply effort"
+  },
+  {
+    "id": "seed_api_new_endpoint",
+    "change_description": "Adding a new API endpoint",
+    "scope": ["api", "backend"],
+    "raw_feedback": "Adding a new API endpoint is well-scoped work when the data model already exists. Estimate is usually accurate.",
+    "parsed_direction": "correct",
+    "parsed_magnitude": 0.2,
+    "principle": "Familiarity principle: new endpoints follow established patterns"
+  },
+  {
+    "id": "seed_api_contract_change",
+    "change_description": "Modifying an existing API contract, changing request or response shape",
+    "scope": ["api", "backend"],
+    "raw_feedback": "Changing existing API contracts is consistently underestimated because all consumers must be found, updated, and tested.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.6,
+    "principle": "Risk principle: breaking changes propagate to all consumers"
+  },
+  {
+    "id": "seed_auth",
+    "change_description": "Authentication, authorization, login, OAuth, SSO, session, permissions",
+    "scope": ["backend", "api"],
+    "raw_feedback": "Auth changes are almost always underestimated. They touch security-critical paths, require edge case handling, and carry high production risk.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.7,
+    "principle": "Risk principle: auth is a critical system — bugs have severe consequences"
+  },
+  {
+    "id": "seed_performance",
+    "change_description": "Performance optimization, speed improvement, latency reduction, memory usage",
+    "scope": ["backend"],
+    "raw_feedback": "Performance tasks are highly uncertain. The root cause is often unknown upfront, profiling reveals surprises, and optimizations frequently require architectural changes.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.8,
+    "principle": "Unknown principle: vague performance goals = high uncertainty multiplier"
+  },
+  {
+    "id": "seed_db_migration",
+    "change_description": "Database migration, schema change, adding or removing columns or tables",
+    "scope": ["database"],
+    "raw_feedback": "Database migrations are consistently underestimated. Data integrity risks, rollback planning, and production deployment concerns add significant overhead beyond the code change itself.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.7,
+    "principle": "Risk principle: data integrity is irreversible — migrations require extra caution"
+  },
+  {
+    "id": "seed_db_index",
+    "change_description": "Adding a database index or query optimization",
+    "scope": ["database"],
+    "raw_feedback": "Adding indexes is usually safe and fast. The change is contained, the pattern is well-understood, and rollback is straightforward.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.3,
+    "principle": "Surface area principle: index additions are isolated and reversible"
+  },
+  {
+    "id": "seed_config",
+    "change_description": "Configuration change, environment variable, feature flag, settings file",
+    "scope": ["config"],
+    "raw_feedback": "Configuration changes are usually fast. They are contained, well-understood, and rarely require touching application logic.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.4,
+    "principle": "Surface area principle: config changes are isolated from business logic"
+  },
+  {
+    "id": "seed_env_secrets",
+    "change_description": "Environment variable, secret management, credentials, API keys",
+    "scope": ["config"],
+    "raw_feedback": "Secret and credential management changes are faster to code but carry production deployment risk that is often not accounted for in estimates.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.4,
+    "principle": "Risk principle: production secrets require coordinated deployment"
+  },
+  {
+    "id": "seed_unit_tests",
+    "change_description": "Adding unit tests, writing test cases",
+    "scope": ["test"],
+    "raw_feedback": "Writing unit tests is well-understood and predictable work. Effort is usually slightly overestimated.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.3,
+    "principle": "Familiarity principle: test patterns are repetitive and well-scoped"
+  },
+  {
+    "id": "seed_integration_tests",
+    "change_description": "Adding integration tests, end-to-end tests",
+    "scope": ["test"],
+    "raw_feedback": "Integration tests are harder than unit tests due to environment setup, flakiness, and dependency management. Estimates are usually accurate or slightly low.",
+    "parsed_direction": "correct",
+    "parsed_magnitude": 0.2,
+    "principle": "Integration depth principle: integration tests expose real system complexity"
+  },
+  {
+    "id": "seed_refactor",
+    "change_description": "Refactoring, restructuring, cleaning up code without changing behavior",
+    "scope": ["backend"],
+    "raw_feedback": "Refactoring is regularly underestimated. It pulls in more files than expected via import chains, and verifying no behavioral change requires thorough testing.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.5,
+    "principle": "Amplification principle: refactoring spreads through import graphs unpredictably"
+  },
+  {
+    "id": "seed_rename_reorganize",
+    "change_description": "Renaming modules, reorganizing folder structure, moving files",
+    "scope": ["backend"],
+    "raw_feedback": "Module renaming and reorganization is consistently underestimated because every import across the codebase must be found and updated.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.5,
+    "principle": "Propagation principle: renames propagate through all import references"
+  },
+  {
+    "id": "seed_third_party_integration",
+    "change_description": "Integrating a third-party API, external service, SDK, or library",
+    "scope": ["backend", "api", "external"],
+    "raw_feedback": "Third-party integrations always take longer than estimated. API exploration, undocumented edge cases, rate limits, authentication flows, and error handling all add hidden complexity.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.7,
+    "principle": "Unknown principle: external APIs introduce unknowns that cannot be anticipated"
+  },
+  {
+    "id": "seed_bug_fix_isolated",
+    "change_description": "Bug fix in an isolated or well-understood module",
+    "scope": ["backend"],
+    "raw_feedback": "Isolated bug fixes in well-understood modules are usually faster than estimated. The scope is clear and the pattern is known.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.4,
+    "principle": "Familiarity principle: known systems with clear bugs are fast to fix"
+  },
+  {
+    "id": "seed_bug_fix_unknown",
+    "change_description": "Bug fix where root cause is unknown, intermittent bug, hard to reproduce",
+    "scope": ["backend"],
+    "raw_feedback": "Bugs with unknown root causes are massively underestimated. Investigation time alone can exceed the fix time by 5x.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.9,
+    "principle": "Unknown principle: unknown root cause = investigation overhead dominates"
+  },
+  {
+    "id": "seed_cross_layer",
+    "change_description": "Feature touching multiple layers — frontend, backend, database together",
+    "scope": ["frontend", "backend", "database", "api"],
+    "raw_feedback": "Cross-layer features are the most commonly underestimated category. Coordination overhead, integration testing, and dependency sequencing all add time beyond individual layer estimates.",
+    "parsed_direction": "higher",
+    "parsed_magnitude": 0.5,
+    "principle": "Integration depth principle: cross-layer work multiplies coordination overhead"
+  },
+  {
+    "id": "seed_logging_monitoring",
+    "change_description": "Adding logging, monitoring, metrics, alerting, observability",
+    "scope": ["backend", "config"],
+    "raw_feedback": "Logging and monitoring additions are usually fast and lower than graph score suggests because they add to modules without changing their logic.",
+    "parsed_direction": "lower",
+    "parsed_magnitude": 0.3,
+    "principle": "Surface area principle: observability additions are additive, not disruptive"
+  }
+]
