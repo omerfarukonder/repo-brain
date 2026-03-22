@@ -21,6 +21,8 @@ class ImpactAnalyzer:
         rag: RAGIndex,
         llm: LLMClient,
         repo_path: str,
+        feedback_manager=None,
+        architecture_report: dict | None = None,
     ) -> dict:
         """Analyze change impact.
 
@@ -37,12 +39,23 @@ class ImpactAnalyzer:
         all_files = list(parsed_code.get("files", {}).keys())
         files_list = "\n".join(f"- {f}" for f in all_files)
 
+        # Retrieve past feedback on similar changes to inform seed identification.
+        feedback_context = ""
+        if feedback_manager is not None:
+            past_feedback = feedback_manager.get_relevant_context(change_description, top_k=3)
+            if past_feedback:
+                feedback_context = (
+                    "\n\nPast feedback on similar changes (use to improve your answer):\n"
+                    + "\n---\n".join(past_feedback)
+                )
+
         prompt = (
             f"You are a code analysis assistant. Given the repository context below, "
             f"identify which files would need to be modified for the following change request.\n\n"
             f"Change request: \"{change_description}\"\n\n"
             f"Repository files (sample):\n{files_list}\n\n"
-            f"Repository context:\n{context}\n\n"
+            f"Repository context:\n{context}"
+            f"{feedback_context}\n\n"
             f"Return ONLY a JSON array of file paths from the repository that would need changes. "
             f"Example: [\"auth/service.py\", \"auth/routes.py\"]\n"
             f"If you cannot determine this from the context, return: []\n"
@@ -138,12 +151,31 @@ class ImpactAnalyzer:
 
         affected_list = sorted(affected)
 
+        # ── Task interpretation (dev-thinking §2) ────────────────────────
+        # Run the 6-step pipeline to extract clarified intent, unknowns,
+        # risks, atomic tasks, and scope for richer effort estimation.
+        interpretation: dict = {}
+        if architecture_report is not None:
+            try:
+                from repobrain.src.interpreter.task_interpreter import TaskInterpreter
+                interpretation = TaskInterpreter().interpret(
+                    change_description,
+                    affected_list,
+                    architecture_report,
+                    parsed_code,
+                    rag,
+                    llm,
+                )
+            except Exception:
+                interpretation = {}
+
         result = {
             "change_description": change_description,
             "seed_modules": seed_modules,
             "affected_modules": affected_list,
             "total_affected": len(affected_list),
             "edit_steps": edit_steps,
+            "interpretation": interpretation,
         }
 
         root = Path(repo_path).resolve()

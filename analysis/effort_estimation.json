@@ -1,0 +1,67 @@
+{
+  "complexity": "Low",
+  "effort_range": "4-9 hours",
+  "testing_effort": "4 hours",
+  "confidence": "85%",
+  "layers_touched": [
+    "AI",
+    "API",
+    "Graph",
+    "Parser",
+    "Service"
+  ],
+  "clarified_intent": "Add a new heading to the streamlit UI",
+  "scope": [
+    "frontend"
+  ],
+  "unknown_level": "Low",
+  "unknowns": [],
+  "risks": [],
+  "insufficient_info": false,
+  "task_breakdown": [
+    {
+      "task": "Create a new file for streamlit UI layout",
+      "layer": "frontend",
+      "min_hours": 0.25,
+      "max_hours": 0.5
+    },
+    {
+      "task": "Add the new heading to the existing Streamlit app",
+      "layer": "frontend",
+      "min_hours": 1.0,
+      "max_hours": 2.0
+    },
+    {
+      "task": "Test the new heading in various scenarios (e.g., different screen sizes, devices)",
+      "layer": "test",
+      "min_hours": 0.5,
+      "max_hours": 1.0
+    },
+    {
+      "task": "Update the app.py file to include the new UI component",
+      "layer": "frontend",
+      "min_hours": 0.25,
+      "max_hours": 0.5
+    }
+  ],
+  "eta_range": "3.5h\u20136.9h",
+  "uncertainty_mult": 1.2,
+  "context_mult": 1.44,
+  "reasoning": "Surface area 5/5 (5 layers: AI, API, Graph, Parser, Service). integration depth 2/5. unknowns 1/5 (Low). risk 2/5. cognitive load 2/5. graph score 134.2/50. dev-thinking score 12/25.",
+  "dev_thinking_score": 12,
+  "scores": {
+    "coupling_density": 2.64,
+    "propagation_risk": 2.5,
+    "chromatic_estimate": 3.0,
+    "domination_number": 3.0,
+    "amplification_ratio": 10.0,
+    "graph_total": 134.2,
+    "calibration_factor": 0.7,
+    "surface_area": 5,
+    "integration_depth": 2,
+    "unknowns_score": 1,
+    "risk_score": 2,
+    "cognitive_load": 2,
+    "dev_thinking_total": 12
+  }
+}

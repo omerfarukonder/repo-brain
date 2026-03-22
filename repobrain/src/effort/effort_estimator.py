@@ -96,10 +96,15 @@ class EffortEstimator:
         architecture_report: dict,
         repo_path: str,
         llm=None,  # kept for API compatibility, not used
+        feedback_manager=None,
     ) -> dict:
         affected: list[str] = impact_report.get("affected_modules", [])
         seed_modules: list[str] = impact_report.get("seed_modules", [])
         layers_map: dict[str, list[str]] = architecture_report.get("layers", {})
+        arch_pattern: str = architecture_report.get("pattern", "unknown")
+
+        # Read interpretation from impact_report if TaskInterpreter was run
+        interpretation: dict = impact_report.get("interpretation", {})
 
         # Build the undirected subgraph of affected modules for analysis.
         # We use undirected because coupling/coloring don't depend on direction.
@@ -108,75 +113,125 @@ class EffortEstimator:
         ).to_undirected()
 
         # ── Signal 1: Coupling Density ───────────────────────────────────
-        # density = 2|E| / (|V|(|V|-1)) for undirected graphs.
-        # 0 = no edges (fully decoupled), 1 = complete graph (max coupling).
         coupling = _coupling_density(subgraph)
 
         # ── Signal 2: Change Propagation Probability ─────────────────────
-        # For each seed module, compute: fan_out * betweenness_centrality.
-        # Sum and normalize. High values mean seeds are "super-spreaders".
         propagation = _propagation_risk(seed_modules, graph)
 
         # ── Signal 3: Chromatic Number (greedy upper bound) ──────────────
-        # Uses the greedy coloring heuristic on the affected subgraph.
-        # More colors = more sequential dependency chains = less parallelism.
         chromatic = _chromatic_estimate(subgraph)
 
         # ── Signal 4: Domination Number (greedy approximation) ───────────
-        # Greedy minimum dominating set: pick the node covering the most
-        # uncovered neighbors, repeat. This is a log(n)-approximation of
-        # the NP-hard minimum dominating set problem.
         domination = _domination_number(subgraph)
 
         # ── Signal 5: Seed-to-Affected Amplification ─────────────────────
-        # ratio = affected / seed. A ratio of 1 means no amplification;
-        # higher means the change is pulling in unintended modules.
         amplification = _amplification_ratio(seed_modules, affected)
 
-        # ── Weighted total ───────────────────────────────────────────────
+        # ── Weighted graph total ─────────────────────────────────────────
         # Each signal is already on a 0–10 scale.
         # Weighted sum → 0–50 range mapped to complexity tiers.
-        total = (
-            coupling      * _W_COUPLING      * 50
-            + propagation * _W_PROPAGATION    * 50
-            + chromatic   * _W_CHROMATIC      * 50
-            + domination  * _W_DOMINATION     * 50
-            + amplification * _W_AMPLIFICATION * 50
+        graph_total = (
+            coupling        * _W_COUPLING      * 50
+            + propagation   * _W_PROPAGATION   * 50
+            + chromatic     * _W_CHROMATIC      * 50
+            + domination    * _W_DOMINATION     * 50
+            + amplification * _W_AMPLIFICATION  * 50
+        )
+        # Clamp to non-negative (amplification_ratio fix)
+        graph_total = max(0.0, graph_total)
+
+        # ── Dev-thinking score (§3 of dev-thinking.md) ──────────────────
+        # 5 dimensions, each 1–5, total /25
+        layers_touched = sorted(_layers_touched(affected, layers_map))
+        unknown_level = interpretation.get("unknown_level", "Medium")
+        risks = interpretation.get("risks", [])
+
+        surface_area   = _dt_surface_area(affected, layers_touched)
+        integ_depth    = _dt_integration_depth(coupling, propagation)
+        unknowns_score = _dt_unknowns_score(unknown_level)
+        risk_score     = _dt_risk_score(risks, layers_touched, propagation)
+        cognitive_load = _dt_cognitive_load(chromatic, domination)
+
+        dev_thinking_total = surface_area + integ_depth + unknowns_score + risk_score + cognitive_load
+
+        # ── ETA formula (§4 of dev-thinking.md) ─────────────────────────
+        atomic_tasks = interpretation.get("atomic_tasks", [])
+        eta_range, uncertainty_mult, context_mult = _compute_eta(
+            atomic_tasks, unknown_level, arch_pattern, layers_touched
         )
 
+        # ── Feedback calibration ─────────────────────────────────────────
+        calibration_factor = 1.0
+        if feedback_manager is not None:
+            calibration_factor = feedback_manager.get_calibration_factor()
+            graph_total = graph_total * calibration_factor
+
         # ── Map to complexity tier ───────────────────────────────────────
-        if total < 8:
-            complexity = _COMPLEXITY_TRIVIAL
-        elif total < 16:
-            complexity = _COMPLEXITY_LOW
-        elif total <= 30:
-            complexity = _COMPLEXITY_MEDIUM
+        # Use dev-thinking score when available, fall back to graph score.
+        if interpretation:
+            # dev_thinking_total range: 5–25 → map: <8 Trivial, 8-14 Low, 15-21 Medium, >21 High
+            if dev_thinking_total < 8:
+                complexity = _COMPLEXITY_TRIVIAL
+            elif dev_thinking_total < 15:
+                complexity = _COMPLEXITY_LOW
+            elif dev_thinking_total <= 21:
+                complexity = _COMPLEXITY_MEDIUM
+            else:
+                complexity = _COMPLEXITY_HIGH
         else:
-            complexity = _COMPLEXITY_HIGH
+            # Fall back to graph-only tier
+            if graph_total < 8:
+                complexity = _COMPLEXITY_TRIVIAL
+            elif graph_total < 16:
+                complexity = _COMPLEXITY_LOW
+            elif graph_total <= 30:
+                complexity = _COMPLEXITY_MEDIUM
+            else:
+                complexity = _COMPLEXITY_HIGH
 
         effort = _EFFORT_MAP[complexity]
 
         # ── Confidence ───────────────────────────────────────────────────
         # Confidence increases with more data points (affected modules).
+        # Reduced when unknown_level is High.
         n = len(affected)
         if n >= 10:
-            confidence = "85%"
+            confidence_pct = 85
         elif n >= 5:
-            confidence = "75%"
+            confidence_pct = 75
         elif n >= 2:
-            confidence = "65%"
+            confidence_pct = 65
         else:
-            confidence = "50%"
+            confidence_pct = 50
+        # Penalise for high unknowns
+        if unknown_level == "High":
+            confidence_pct = max(30, confidence_pct - 20)
+        elif unknown_level == "Medium":
+            confidence_pct = max(40, confidence_pct - 5)
+        confidence = f"{confidence_pct}%"
 
-        layers_touched = sorted(_layers_touched(affected, layers_map))
+        # ── Reasoning (deterministic, no LLM) ────────────────────────────
+        reasoning = _build_reasoning(
+            surface_area, integ_depth, unknowns_score, risk_score, cognitive_load,
+            unknown_level, layers_touched, graph_total, dev_thinking_total
+        )
 
         scores = {
+            # Graph signals
             "coupling_density": round(coupling, 2),
             "propagation_risk": round(propagation, 2),
             "chromatic_estimate": round(chromatic, 2),
             "domination_number": round(domination, 2),
             "amplification_ratio": round(amplification, 2),
-            "total": round(total, 2),
+            "graph_total": round(graph_total, 2),
+            "calibration_factor": round(calibration_factor, 3),
+            # Dev-thinking dimensions
+            "surface_area": surface_area,
+            "integration_depth": integ_depth,
+            "unknowns_score": unknowns_score,
+            "risk_score": risk_score,
+            "cognitive_load": cognitive_load,
+            "dev_thinking_total": dev_thinking_total,
         }
 
         result = {
@@ -185,6 +240,19 @@ class EffortEstimator:
             "testing_effort": effort["testing"],
             "confidence": confidence,
             "layers_touched": layers_touched,
+            # Dev-thinking enrichment
+            "clarified_intent": interpretation.get("clarified_intent", ""),
+            "scope": interpretation.get("scope", []),
+            "unknown_level": unknown_level,
+            "unknowns": interpretation.get("unknowns", []),
+            "risks": risks,
+            "insufficient_info": interpretation.get("insufficient_info", False),
+            "task_breakdown": atomic_tasks,
+            "eta_range": eta_range,
+            "uncertainty_mult": round(uncertainty_mult, 2),
+            "context_mult": round(context_mult, 2),
+            "reasoning": reasoning,
+            "dev_thinking_score": dev_thinking_total,
             "scores": scores,
         }
 
@@ -311,14 +379,13 @@ def _amplification_ratio(seed_modules: list[str], affected: list[str]) -> float:
     - ratio = 1: no amplification, change is perfectly contained.
     - ratio = 5: each seed file drags in 4 extra files on average.
 
-    A high ratio signals that the codebase has tight coupling around
-    the change area — the developer's "small" change has large side effects.
+    Clamped to [0, 10] — can never be negative.
     """
     n_seed = max(len(seed_modules), 1)
     n_affected = len(affected)
     ratio = n_affected / n_seed
-    # Scale: ratio of 1 = 0, ratio of ~4+ = 10
-    return min((ratio - 1) * 3.0, 10.0)
+    # Scale: ratio of 1 = 0, ratio of ~4+ = 10; clamp to [0, 10]
+    return max(0.0, min((ratio - 1) * 3.0, 10.0))
 
 
 def _layers_touched(affected: list[str], layers_map: dict[str, list[str]]) -> set[str]:
@@ -329,3 +396,170 @@ def _layers_touched(affected: list[str], layers_map: dict[str, list[str]]) -> se
             if mod in affected:
                 touched.add(layer)
     return touched
+
+
+# ── Dev-thinking scoring helpers (§3) ────────────────────────────────────────
+
+
+def _dt_surface_area(affected: list[str], layers_touched: list[str]) -> int:
+    """Surface Area dimension (1–5).
+
+    Based on number of affected modules, capped by architectural breadth
+    (number of distinct layers touched).
+    """
+    n = len(affected)
+    if n <= 2:
+        base = 1
+    elif n <= 5:
+        base = 2
+    elif n <= 10:
+        base = 3
+    elif n <= 20:
+        base = 4
+    else:
+        base = 5
+    # Bump if spanning many layers
+    layer_bump = min(len(layers_touched) - 1, 2) if layers_touched else 0
+    return min(5, base + layer_bump // 2)
+
+
+def _dt_integration_depth(coupling: float, propagation: float) -> int:
+    """Integration Depth dimension (1–5).
+
+    Derived from coupling density and propagation risk (0–10 each).
+    Average → mapped to 1–5.
+    """
+    avg = (coupling + propagation) / 2.0  # 0–10
+    if avg < 2:
+        return 1
+    elif avg < 4:
+        return 2
+    elif avg < 6:
+        return 3
+    elif avg < 8:
+        return 4
+    else:
+        return 5
+
+
+def _dt_unknowns_score(unknown_level: str) -> int:
+    """Unknowns dimension (1–5). Directly from TaskInterpreter unknown_level."""
+    return {"Low": 1, "Medium": 3, "High": 5}.get(unknown_level, 3)
+
+
+def _dt_risk_score(risks: list[str], layers_touched: list[str], propagation: float) -> int:
+    """Risk dimension (1–5).
+
+    Based on number of explicit risks + critical layers + propagation.
+    """
+    base = 1
+    n_risks = len(risks)
+    if n_risks == 0:
+        base = 1
+    elif n_risks <= 2:
+        base = 2
+    else:
+        base = 3
+    # Critical layer bump
+    critical = {"Database", "API", "Repository"}
+    if any(layer in critical for layer in layers_touched):
+        base += 1
+    # High propagation bump
+    if propagation >= 7:
+        base += 1
+    return min(5, base)
+
+
+def _dt_cognitive_load(chromatic: float, domination: float) -> int:
+    """Cognitive Load dimension (1–5).
+
+    Derived from chromatic estimate and domination number (0–10 each).
+    """
+    avg = (chromatic + domination) / 2.0  # 0–10
+    if avg < 2:
+        return 1
+    elif avg < 4:
+        return 2
+    elif avg < 6:
+        return 3
+    elif avg < 8:
+        return 4
+    else:
+        return 5
+
+
+# ── ETA formula (§4) ─────────────────────────────────────────────────────────
+
+
+def _compute_eta(
+    atomic_tasks: list[dict],
+    unknown_level: str,
+    arch_pattern: str,
+    layers_touched: list[str],
+) -> tuple[str, float, float]:
+    """Compute ETA range string using §4 formula.
+
+    Returns (eta_range_str, uncertainty_mult, context_mult).
+    """
+    if not atomic_tasks:
+        return ("", 1.0, 1.0)
+
+    raw_min = sum(float(t.get("min_hours", 1)) for t in atomic_tasks)
+    raw_max = sum(float(t.get("max_hours", 2)) for t in atomic_tasks)
+
+    uncertainty_mult = {"Low": 1.2, "Medium": 1.5, "High": 2.0}.get(unknown_level, 1.5)
+
+    context_mult = {
+        "Monolith": 1.0,
+        "Pipeline Architecture": 1.2,
+        "Layered Architecture": 1.3,
+        "Microservices": 1.5,
+    }.get(arch_pattern, 1.2)
+
+    if len(layers_touched) >= 3:
+        context_mult *= 1.2
+
+    final_min = raw_min * uncertainty_mult * context_mult
+    final_max = raw_max * uncertainty_mult * context_mult
+
+    # Convert to days if > 8h
+    def _fmt(hours: float) -> str:
+        if hours < 1:
+            return f"{hours * 60:.0f}m"
+        elif hours <= 8:
+            return f"{hours:.1f}h"
+        else:
+            days = hours / 8
+            return f"{days:.1f}d"
+
+    eta_range = f"{_fmt(final_min)}–{_fmt(final_max)}"
+    return (eta_range, uncertainty_mult, context_mult)
+
+
+# ── Reasoning builder ─────────────────────────────────────────────────────────
+
+
+def _build_reasoning(
+    surface_area: int,
+    integ_depth: int,
+    unknowns_score: int,
+    risk_score: int,
+    cognitive_load: int,
+    unknown_level: str,
+    layers_touched: list[str],
+    graph_total: float,
+    dev_thinking_total: int,
+) -> str:
+    parts = [
+        f"Surface area {surface_area}/5"
+        + (f" ({len(layers_touched)} layers: {', '.join(layers_touched)})" if layers_touched else ""),
+        f"integration depth {integ_depth}/5",
+        f"unknowns {unknowns_score}/5 ({unknown_level})",
+        f"risk {risk_score}/5",
+        f"cognitive load {cognitive_load}/5",
+    ]
+    if risk_score >= 4:
+        parts.append("HIGH PRODUCTION RISK detected")
+    parts.append(f"graph score {graph_total:.1f}/50")
+    parts.append(f"dev-thinking score {dev_thinking_total}/25")
+    return ". ".join(parts) + "."
