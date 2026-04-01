@@ -317,4 +317,4 @@ RepoBrain can grow from a repository analysis tool into a broader engineering in
 
 ## License
 
-No license file is currently present in this repository. Add one before public distribution.
+This project is licensed under the MIT License. See [`LICENSE`](/Users/omerfarukonder/Desktop/Projects/repo-brain/LICENSE).
